@@ -169,7 +169,6 @@ with st.spinner('consultando datos...'):
                     #  Permite ajustar el ancho al tamaño del contenedor    
                     use_container_width=True
         )
-        
         saldo_facturas.to_excel(buf := BytesIO())
         st.download_button(
             'Download file',
