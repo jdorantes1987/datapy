@@ -6,7 +6,6 @@ from navigation import make_sidebar
 from empresa import ClsEmpresa
 from consulta_data import ClsData
 
-locale.setlocale(locale.LC_ALL, 'es_ES')
 st.set_page_config(page_title='DataPy: Ingresos', 
                    layout='wide', 
                    page_icon=':vs:')
@@ -24,7 +23,9 @@ def data_documentos(empresa, usd):
     df = ClsData(empresa).ventas_rsm(anio='all', 
                                      mes='all', 
                                      usd=usd)
+    locale.setlocale(locale.LC_ALL, 'es_ES')
     df['mes_x'] = df['fec_reg'].dt.month_name(locale='es_ES').str[:3]
+    locale.setlocale(locale.LC_ALL, '')
     return df
 
 def total_ingresos_anio_anterior(empresa, anio, vendedor, usd):

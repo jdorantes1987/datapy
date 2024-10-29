@@ -2,7 +2,6 @@ import os
 from datetime import date
 from datetime import datetime
 import time
-import locale
 from calendar import month_name
 import streamlit as st
 from streamlit import session_state as ss, data_editor as de
@@ -13,7 +12,6 @@ from consulta_data import ClsData
 from empresa import ClsEmpresa
 from facturacion_masiva import FacturacionMasiva
 
-locale.setlocale(locale.LC_ALL, 'es_ES')
 st.set_page_config(page_title='DataPy: Facturación masiva', layout='wide',page_icon=':vs:')
 st.header("📰 Facturación Masiva", 
           help="Prepare el archivo excel correpondiente al módulo a trabajar para proceder con las facturación.")

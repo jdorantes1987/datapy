@@ -15,9 +15,6 @@ from accesos.datos import get_fecha_tasa_bcv_del_dia
 from accesos.datos_profit import datos_profit
 from gestion_user.usuarios import ClsUsuarios
 
-
-locale.setlocale(locale.LC_ALL, 'es_ES')
-
 class FacturacionMasiva:
 
     def __init__(self, data, host, data_base):
@@ -102,8 +99,9 @@ class FacturacionMasiva:
                 suc='01'
         else: 
             comentario = ""
-        
+        locale.setlocale(locale.LC_ALL, 'es_ES')
         campo5 = to_datetime(date_current).month_name(locale='es_ES')
+        locale.setlocale(locale.LC_ALL, '')
         campo7 = to_datetime(date_current).year
         # itera la cantidad de documentos a facturar
         for index, row in data_con_iva.iterrows():
