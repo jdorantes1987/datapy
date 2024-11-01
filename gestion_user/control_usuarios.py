@@ -31,6 +31,15 @@ def change_password(user, pw):
     db.insert_sql(sql,
                   host=os.getenv('HOST_DESARROLLO_PROFIT'), 
                   base_de_datos=os.getenv('DB_NAME_DERECHA_PROFIT'))
+
+def insert_user(user, nombre, pw):
+    sql = f"""
+          insert into usuarios(idusuario, nombre, passw) values('{user}','{nombre}',PWDENCRYPT('{pw}'))
+          """
+    db.insert_sql(sql,
+                  host=os.getenv('HOST_DESARROLLO_PROFIT'), 
+                  base_de_datos=os.getenv('DB_NAME_DERECHA_PROFIT'))    
+    
     
     
 # aut = aut_user('amonasterios', 'ale')    
