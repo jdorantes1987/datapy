@@ -1,5 +1,6 @@
 import time
 import streamlit as st
+from pandas import DataFrame
 from navigation import make_sidebar
 import gestion_user.usuarios as u
 from gestion_user.control_usuarios import aut_user, change_password, insert_user
@@ -9,6 +10,11 @@ st.set_page_config(page_title='DataPy: Reiniciar clave',
                    layout='centered', 
                    page_icon=':vs:')
 make_sidebar()
+
+@st.cache_data
+def roles_user():
+   return ClsUsuariosRoles.roles()
+
 st.title("Gestion de Usuarios")
 with st.expander("Cambiar clave de usuario"):
       current_password = st.text_input("clave actual", type="password")
@@ -28,7 +34,9 @@ with st.expander("Cambiar clave de usuario"):
          else:
             st.error("La clave ingresada no coincide con la anterior.")
 
-if ClsUsuariosRoles.roles()['Admin'] == 1:
+roles = roles_user()
+df_roles = DataFrame.from_dict(roles, orient='index', columns=['usuario', 'habilitado', 'id'])[['habilitado']]
+if roles.get('Admin', 0)[1] == 1:
    with st.expander("agregar nuevo usuario"):
          id_user = st.text_input(label='id usuario',
                                  disabled=False,
@@ -43,5 +51,19 @@ if ClsUsuariosRoles.roles()['Admin'] == 1:
          if st.button('agregar'):
             insert_user(id_user, nombre, password) 
             st.success("registro satisfactorio!")
-      
+            
+   if roles.get('Admin', 0)[1] == 1:
+      with st.expander("agregar roles usuario"):
+         st.data_editor(
+                        df_roles,
+                        column_config={
+                           "habilitado": st.column_config.CheckboxColumn(
+                                 "habilitado?",
+                                 help="clic para habilitar modulo ",
+                                 default=False,
+                           )
+                        },
+                        disabled=[""],
+                        hide_index=False,
+                     )
          

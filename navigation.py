@@ -38,15 +38,15 @@ def make_sidebar():
         
 # TODO Rename this here and in `make_sidebar`
 def _extracted_from_make_sidebar():
-    if ur.ClsUsuariosRoles.roles()['Derecha'] == 1 or ur.ClsUsuariosRoles.roles()['Izquierda'] == 1:
+    if ur.ClsUsuariosRoles.roles().get('Derecha', 0)[1] == 1 or ur.ClsUsuariosRoles.roles().get('Izquierda')[1] == 1:
         st.page_link("pages/page1.py", label="Inicio", icon=None)
-    if ur.ClsUsuariosRoles.roles()['Ingresos'] == 1:
+    if ur.ClsUsuariosRoles.roles().get('Ingresos', 0)[1] == 1:
         st.page_link("pages/page2.py", label="Ingresos", icon=None)
-    if ur.ClsUsuariosRoles.roles()['Cxc'] == 1:    
+    if ur.ClsUsuariosRoles.roles().get('Cxc', 0)[1] == 1:    
         st.page_link("pages/page3.py", label="Cuentas por cobrar", icon=None)
-    if ur.ClsUsuariosRoles.roles()['Facturacion'] == 1:
+    if ur.ClsUsuariosRoles.roles().get('Facturacion', 0)[1] == 1:
         st.page_link("pages/page4.py", label="Facturación masiva", icon=None)
-    if ur.ClsUsuariosRoles.roles()['Mikrowisp'] == 1:    
+    if ur.ClsUsuariosRoles.roles().get('Mikrowisp', 0)[1] == 1:    
         st.page_link("pages/page5.py", label="Mikrowisp", icon=None)
     st.page_link("pages/page6.py", label="Clientes", icon=None)
     st.page_link("pages/page7.py", label="Configuración", icon=None)
@@ -54,9 +54,9 @@ def _extracted_from_make_sidebar():
     st.write("\n" * 2)
     l_modulos = ['Derecha', 'Izquierda']
     # administra el acceso del usuario a los módulos
-    if ur.ClsUsuariosRoles.roles()['Derecha'] == 0:
+    if ur.ClsUsuariosRoles.roles().get('Derecha', 0)[1] == 0:
         l_modulos.pop(0)
-    elif ur.ClsUsuariosRoles.roles()['Izquierda'] == 0:
+    elif ur.ClsUsuariosRoles.roles().get('Izquierda', 0)[1] == 0:
         l_modulos.pop(1)        
 
     indice_mod = l_modulos.index(st.session_state['modulo'])

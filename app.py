@@ -31,7 +31,7 @@ if st.button("Log in", type="primary"):
         st.session_state['refrescar_facturacion'] = False 
         sleep(0.5)
         roles = roles()
-        modulo = 'Izquierda' if roles['Izquierda'] == 1 else 'Derecha'
+        modulo = 'Izquierda' if roles.get('Izquierda', 0)[1] == 1 else 'Derecha'
         st.session_state.modulo = modulo
         ClsEmpresa(modulo, False)
         st.switch_page(MENU_INICIO)

@@ -13,15 +13,9 @@ def dict_users_rols(id_user):
     df = get_read_sql(sql=sql, 
                       host=os.getenv('HOST_DESARROLLO_PROFIT'), 
                       base_de_datos=os.getenv('DB_NAME_DERECHA_PROFIT'))
-    users = df.set_index('modulo')['habilitado']
-    return users.to_dict()
+    dit = dict(zip(df['modulo'], df.set_index('modulo').values.tolist()))
+    return dit
 
 def set_roles(id_user):
     d_roles = dict_users_rols(id_user)
     ClsUsuariosRoles(d_roles)
-
-
-# set_roles('amonasterios')
-# print(ur.ClsUsuariosRoles.roles()['Derecha'])
-
-
