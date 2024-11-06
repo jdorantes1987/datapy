@@ -5,8 +5,7 @@ import time
 from calendar import month_name
 import streamlit as st
 from streamlit import session_state as ss, data_editor as de
-from pandas import read_excel
-from pandas import merge
+from pandas import read_excel, merge, DataFrame
 from navigation import make_sidebar
 from consulta_data import ClsData
 from empresa import ClsEmpresa
@@ -28,6 +27,17 @@ if ClsEmpresa.modulo() == 'Derecha':
     ruta_archivo = f'{carpeta}Planes Facturacion Clientes Derecha.xlsx'
 else:
     ruta_archivo = f'{carpeta}Planes Facturacion Clientes Izquierda.xlsx'
+
+
+if 'stage' not in st.session_state or 'data_masiva' not in st.session_state:
+    st.session_state.stage = 0
+
+def set_stage(i):
+    st.session_state.stage = i
+    
+if st.button('Refrescar'):
+    st.cache_data.clear()
+    set_stage(0)
 
 @st.cache_data
 def obtener_data(file):
@@ -55,12 +65,6 @@ def lista_articulos(empresa):
 def lista_clientes(empresa):
     return ClsData(empresa).clientes()
 
-if 'stage' not in st.session_state:
-    st.session_state.stage = 0
-
-def set_state(i):
-    st.session_state.stage = i
-
 if st.session_state.stage == 0:
     st.session_state.disabled = False
     ss.data_masiva = obtener_data(ruta_archivo)
@@ -69,7 +73,7 @@ if st.session_state.stage == 0:
     ss.lista_clientes = lista_clientes(ClsEmpresa.empresa_seleccionada())    
     ss.lista_articulos['articulos'] = ss.lista_articulos['co_art'] + ' | ' + ss.lista_articulos['art_des']
     ss.lista_clientes['clientes'] = ss.lista_clientes['co_cli'] + ' | ' + ss.lista_clientes['cli_des']
-    set_state(1)
+    set_stage(1)
 
 edited_df = de(
         ss.data_masiva,
@@ -140,12 +144,13 @@ edited_df = de(
         #  Permite ajustar el ancho al tama帽o del contenedor
         use_container_width=True, 
         disabled=["razon_social"],
+        key='editor',
         hide_index=True,
         num_rows="dynamic",
         )
 
 
-def facturar(state):
+def facturar(stage):
     ss.data_masiva = edited_df
     ss.data_masiva['co_cli'] = ss.data_masiva['buscar_cliente'].apply(lambda x: str.strip(x.split('|')[0]))
     ss.data_masiva['cli_des'] = ss.data_masiva['buscar_cliente'].apply(lambda x:  str.strip(x.split('|')[1]))
@@ -160,18 +165,21 @@ def facturar(state):
                             modulo=modulo, 
                             a_bs=conv_a_usd ,  
                             num_fact_format=es_derecha)
-    set_state(state)
+    set_stage(stage)
 
 
 if st.session_state.stage >= 1 and st.session_state.stage != 3:
     st.button('Facturar', on_click=facturar, args=[3])
 
+if st.session_state.stage == 4:
+    st.switch_page("pages/page2.py")
+
     
 if st.session_state.stage >= 3:
-    set_state(0)
-    st.info("Facturación procesada!")
+    set_stage(0)
+    st.success("Facturación procesada!")
     col1, col2 = st.columns([0.1, 0.1])
     with col1:
-        col1.button("Continuar con la facturación", on_click=set_state, args=[1])
+        col1.button("Ir a estadísticas de facturación", on_click=set_stage, args=[4])
     with col2:
-        col2.button("Cargar datos nuevamente", on_click=set_state, args=[0])
+        col2.button("Seguir en esta página?", on_click=set_stage, args=[1])

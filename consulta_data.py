@@ -9,7 +9,7 @@ from empresa import ClsEmpresa
 sys.path.append('..\\bantel')
 from accesos.datos_profit import datos_profit
 
-# load_dotenv('..\\bantell\\.env')
+# load_dotenv('..\\bantel\\.env')
 
 class ClsData:
     @staticmethod

@@ -14,6 +14,22 @@ def data_user(user, pw):
     return db.get_read_sql(sql=sql, 
                            host=os.getenv('HOST_DESARROLLO_PROFIT'), 
                            base_de_datos=os.getenv('DB_NAME_DERECHA_PROFIT'))
+    
+def get_users():
+    sql = f"""
+          Select * From usuarios
+          """
+    return db.get_read_sql(sql=sql, 
+                           host=os.getenv('HOST_DESARROLLO_PROFIT'), 
+                           base_de_datos=os.getenv('DB_NAME_DERECHA_PROFIT'))
+    
+def existe_user(user):
+    sql = f"""
+          Select * From usuarios where idusuario ='{user}'
+          """
+    return len(db.get_read_sql(sql=sql, 
+                           host=os.getenv('HOST_DESARROLLO_PROFIT'), 
+                           base_de_datos=os.getenv('DB_NAME_DERECHA_PROFIT'))) > 0
 
 def aut_user(user, pw):
     aut = False

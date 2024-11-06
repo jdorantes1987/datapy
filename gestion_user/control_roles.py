@@ -16,6 +16,14 @@ def dict_users_rols(id_user):
     dit = dict(zip(df['modulo'], df.set_index('modulo').values.tolist()))
     return dit
 
+def modulos():
+    sql = f"""
+          select DISTINCT modulo from usuarios_roles
+          """
+    return get_read_sql(sql=sql, 
+                      host=os.getenv('HOST_DESARROLLO_PROFIT'), 
+                      base_de_datos=os.getenv('DB_NAME_DERECHA_PROFIT'))
+
 def set_roles(id_user):
     d_roles = dict_users_rols(id_user)
     ClsUsuariosRoles(d_roles)
