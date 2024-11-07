@@ -1,11 +1,15 @@
 import time
+import sys
+import os
 import streamlit as st
 from pandas import DataFrame
 from navigation import make_sidebar
 import gestion_user.usuarios as u
 from gestion_user.control_usuarios import aut_user, change_password, insert_user, get_users, existe_user
 from gestion_user.usuarios_roles import ClsUsuariosRoles
-from gestion_user.control_roles import dict_users_rols, modulos
+from gestion_user.control_roles import dict_users_rols, modulos, insert_roles
+
+
 
 st.set_page_config(page_title='DataPy: Reiniciar clave', 
                    layout='centered', 
@@ -39,6 +43,11 @@ df_users =  usuarios()
 def agregar_usuario(id_user, nombre, password, stage):
    insert_user(user=id_user, nombre=nombre, pw=password)
    set_stage(stage)
+   
+def agregar_roles(user, data_roles):
+    data = data_roles.reset_index()
+    insert_roles(user=user, data_roles=data)
+   
 
 with st.expander("Cambiar clave de usuario"):
       current_password = st.text_input("clave actual", type="password")
@@ -99,21 +108,30 @@ if roles.get('Admin', 0)[1] == 1:
          df_dit_user_select = DataFrame.from_dict(dit_user_select_roles, orient='index', columns=['usuario', 'habilitado', 'id'])
          if len(df_dit_user_select):
             df_roles = df_dit_user_select
+            df_roles.insert(0, "idusuario", user_select)
+            df_roles.reset_index(inplace=True, names='modulo')
          else:
             df_roles = modulos()
-            df_roles.insert(0, "habilitado", False)
-            df_roles.set_index('modulo', inplace=True)
-            
-         st.data_editor(
-                        df_roles['habilitado'],
+            df_roles.insert(0, "idusuario", user_select)
+            df_roles.insert(1, "habilitado", False)
+    
+         df_roles.set_index('modulo', inplace=True)   
+         de_roles = st.data_editor(
+                        df_roles[['habilitado', 'idusuario']],
                         column_config={
                                        "habilitado": st.column_config.CheckboxColumn(
                                                                                      "habilitado?",
                                                                                      help="clic para habilitar modulo ",
                                                                                      default=False,
-                                                     )
+                                                     ),
+                                       "idusuario": st.column_config.TextColumn(
+                                                                                 "usuario",
+                                                     ),
                         },
-                        disabled=[""],
+                        disabled=["modulo"],
                         hide_index=False,
          )
+         if st.button('agregar roles', on_click=agregar_roles, args=[user_select, de_roles]):
+            st.success('Roles agregados!')
+            set_stage(0)
          

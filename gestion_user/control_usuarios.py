@@ -7,6 +7,7 @@ import gestion_user.usuarios as u
 import gestion_user.control_roles as croles
 
 
+
 def data_user(user, pw):
     sql = f"""
           Select * From usuarios where idusuario ='{user}' and PWDCOMPARE('{pw}', passw)= 1
@@ -54,7 +55,8 @@ def insert_user(user, nombre, pw):
           """
     db.insert_sql(sql,
                   host=os.getenv('HOST_DESARROLLO_PROFIT'), 
-                  base_de_datos=os.getenv('DB_NAME_DERECHA_PROFIT'))    
+                  base_de_datos=os.getenv('DB_NAME_DERECHA_PROFIT'))
+     
     
     
     

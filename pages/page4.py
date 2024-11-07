@@ -157,7 +157,7 @@ def facturar(stage):
     ss.data_masiva['co_art'] = ss.data_masiva['buscar_articulo'].apply(lambda x: str.strip(x.split('|')[0]))
     ss.data_masiva['desc_art'] = ss.data_masiva['buscar_articulo'].apply(lambda x:  str.strip(x.split('|')[1]))
     ofact = FacturacionMasiva(data=ss.data_masiva, 
-                            host='10.100.104.11', 
+                            host=os.getenv("HOST_PRODUCCION_PROFIT"), 
                             data_base=empresa_select)
     conv_a_usd = modulo == 'Derecha'
     es_derecha = modulo != 'Derecha'
