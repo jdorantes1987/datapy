@@ -72,7 +72,8 @@ with st.expander("🔍 Grupos por cliente"):
                                     ascending=False)
     else:
         grupo = grupo_filtrado
-        
+    
+    st.write(f'{len(grupo)} clientes')    
     st.dataframe(grupo,
                  use_container_width=True, 
                  hide_index=True)
