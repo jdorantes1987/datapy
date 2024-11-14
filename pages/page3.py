@@ -95,7 +95,7 @@ with st.spinner('consultando datos...'):
     else:
         ctas_x_cobrar_por_anio_y_seller = ctas_x_cobrar_por_anio[filter_seller]
 
-    format_dict = {'Total facturacion': '{:,.2f}', 'Total por cobrar': '{:,.2f}', 'Porcentaje': '{:.2%}'} # ejemplo {'sum':'${0:,.0f}', 'date': '{:%m-%Y}', 'pct_of_total': '{:.2%}'}
+    format_dict = {'Total facturacion': '{:,.2f}', 'Total por cobrar': '{:,.2f}', 'por cobrar': '{:.2%}'} # ejemplo {'sum':'${0:,.0f}', 'date': '{:%m-%Y}', 'pct_of_total': '{:.2%}'}
     col1, col2 = st.columns(2)
 
     with col1:
@@ -110,7 +110,7 @@ with st.spinner('consultando datos...'):
                                                 left_on=['anio', 'mes'], 
                                                 right_on=['anio', 'mes_x'])[['anio', 'mes', 'total_item', 'saldo_total_doc']]
         
-        ctas_x_cobrar_con_ingresos['Porcentaje'] = ctas_x_cobrar_con_ingresos.apply(lambda x: 
+        ctas_x_cobrar_con_ingresos['por cobrar'] = ctas_x_cobrar_con_ingresos.apply(lambda x: 
                                                                                         x['saldo_total_doc'] / x['total_item'], 
                                                                                     axis=1)
         
@@ -122,7 +122,7 @@ with st.spinner('consultando datos...'):
         st.dataframe(ctas_x_cobrar_con_ingresos.style
         .format(format_dict)
         .background_gradient(
-                             subset=['Total facturacion', 'Total por cobrar', 'Porcentaje'], 
+                             subset=['Total facturacion', 'Total por cobrar', 'por cobrar'], 
                              cmap=cmap), 
                              hide_index=True  #  oculta el indice del dataframe
         )
