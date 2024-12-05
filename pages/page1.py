@@ -89,7 +89,7 @@ if __name__ == '__main__':
         valor = st.number_input('Ingrese el valor de la tasa', format="%.5f")
         if st.button("Deseas actualizar la tasa de forma manual?",  on_click=tasa_manual, args=(fecha, valor)):
           st.info('Tasa BCV actualizada!')
-          st.rerun()
+      st.rerun()
     
 
 with st.expander("📊  Evolución tasa BCV"):

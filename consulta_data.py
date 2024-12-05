@@ -83,12 +83,10 @@ class ClsData:
         conjunto_ultimas_facturas = set(ultimas_facturas['doc_num'])
         datos_utimo_plan_facturado =  df[df['doc_num'].isin(conjunto_ultimas_facturas)][['doc_num', 'fec_emis', 'co_cli', 'cli_des', 'co_art']]
         ultimo_plan =  merge(datos_utimo_plan_facturado, articulos, how='left', left_on='co_art', right_on='co_art')
+        ultimo_plan['fec_emis'] = ultimo_plan['fec_emis'].dt.strftime('%d-%m-%Y')
         return ultimo_plan.sort_values(by='doc_num', ascending=[False])
         
    
-   
-# # # # Ejemplo de uso:
-# data= ClsData('BANTEL_A')
-# print(data.ventas_dt(anio='all', mes='all', usd=True))
-    
-    
+if __name__ == '__main__':   
+    data= ClsData('BANTEL_A')
+    print(data.ultimo_plan_facturado())

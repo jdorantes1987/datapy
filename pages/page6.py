@@ -46,6 +46,32 @@ with tab2:
     :blue[Información de la última facturación].''')
     st.df_ultimo_plan_facturado = ultimo_plan_facturado(company_selected)
     st.dataframe(st.df_ultimo_plan_facturado,
-                use_container_width=True,
+                 column_config={
+                                "doc_num": st.column_config.TextColumn(
+                                "documento",
+                                width="small",    
+                                ),                                
+                                "fec_emis": st.column_config.TextColumn(
+                                "fecha",
+                                width="small",    
+                                ),
+                                "co_cli": st.column_config.TextColumn(
+                                "cliente",
+                                width="small",    
+                                ),
+                                "cli_des": st.column_config.TextColumn(
+                                "razón social",
+                                width="large",    
+                                ),
+                                "co_art": st.column_config.TextColumn(
+                                "artículo",
+                                width="medium",    
+                                ),
+                                "art_des": st.column_config.TextColumn(
+                                "descripción artículo",
+                                width="large",    
+                                ),
+                            },
+                use_container_width=False,
                 hide_index=True)
 
