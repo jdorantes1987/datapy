@@ -165,7 +165,7 @@ with st.spinner('consultando datos...'):
                                             name=vendedor))
                 fig.update_traces(textposition="bottom right")
             fig.update_layout(
-                title="Gráfico Ingresos por Vendedores",
+                title="Ingresos por Vendedores",
                 plot_bgcolor="#E6F1F6",
             )
             st.plotly_chart(fig, 
