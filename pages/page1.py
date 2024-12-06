@@ -1,9 +1,12 @@
 import os
 import time
-import altair as alt 
+import altair as alt
 import streamlit as st
 from multiprocessing import Process, Queue
 from datetime import datetime, date
+
+import plotly.graph_objects as go
+
 from consulta_data import ClsData
 from navigation import make_sidebar
 from banco_central.bcv_estadisticas_tasas import actulizar_file_tasas, actulizar_file_tasas_manual
@@ -51,7 +54,7 @@ def tasa_manual(fecha, valor):
 if __name__ == '__main__':
     odata = ClsData(data_base=os.getenv("DB_NAME_IZQUIERDA_PROFIT"))
     new_cod = odata.generar_cod_cliente()
-    date = odata.get_fecha_tasa_bcv_dia().date()
+    date_t = datetime.strptime(str(odata.get_fecha_tasa_bcv_dia().date()), '%Y-%m-%d')
     table_scorecard = """
     <div class="ui five small statistics">
       <div class="grey statistic">
@@ -62,7 +65,7 @@ if __name__ == '__main__':
         </div>
       </div>
       <div class="grey statistic">
-        <div class="value">""" +str(date)+  """
+        <div class="value">""" + date_t.strftime('%d-%m-%Y') +  """
         </div>
         <div class="grey label">
           Fecha valor tasa BCV
@@ -93,12 +96,20 @@ if __name__ == '__main__':
     
 
 with st.expander("📊  Evolución tasa BCV"):
-     var_tasa = datos_estadisticas_tasas()
-     df = var_tasa[var_tasa['año'] == 2024]
-     chart = alt.Chart(df, title='Histórico').mark_line().encode(
-      x='fecha', y=alt.Y('venta_ask2', scale=alt.Scale(domain=[df['venta_ask2'].min() - 1,df['venta_ask2'].max() + 1])), strokeDash='cod_mon'
-        ).properties(width=650, height=350)     
-     st.altair_chart(chart, use_container_width=True)
+    var_tasa = datos_estadisticas_tasas()
+    df = var_tasa[var_tasa['año'] == date_t.year]
+    fig = go.Figure()
+    fig = fig.add_trace(go.Scatter(x=df["fecha"].dt.normalize(),
+                                y=df["venta_ask2"],
+                                text="Tasa",))
+    fig.update_traces(textposition="bottom right")
+    fig.update_layout(
+        title="Histórico de tasas BCV",
+        plot_bgcolor="#E6F1F6",
+    )
+    fig.update_xaxes(nticks=13)
+    st.plotly_chart(fig, 
+                    use_container_width=True)
      
 
 
