@@ -97,7 +97,7 @@ if __name__ == '__main__':
 
 with st.expander("📊  Evolución tasa BCV"):
     var_tasa = datos_estadisticas_tasas()
-    df = var_tasa[var_tasa['año'] == date_t.year]
+    df = var_tasa[var_tasa['año'] == date.today().year]
     fig = go.Figure()
     fig = fig.add_trace(go.Scatter(x=df["fecha"].dt.normalize(),
                                 y=df["venta_ask2"],
