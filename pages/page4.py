@@ -76,7 +76,7 @@ if st.session_state.stage == 0:
     set_stage(1)
 
 edited_df = de(
-        ss.data_masiva,
+        ss.data_masiva.reset_index(drop=True),
         column_config={
         "buscar_cliente": st.column_config.SelectboxColumn(
             "buscar cliente",
