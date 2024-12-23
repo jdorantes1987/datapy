@@ -1,6 +1,7 @@
-from pandas import DataFrame
 import numpy as np
 import streamlit as st
+from pandas import DataFrame
+
 df = DataFrame(
     {
         "Animal": ["Lion", "Elephant", "Giraffe", "Monkey", "Zebra"],
