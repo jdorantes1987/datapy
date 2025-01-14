@@ -164,7 +164,7 @@ with st.spinner("consultando datos..."):
                 subset=["Total facturacion", "Total por cobrar", "por cobrar"],
                 cmap=cmap,
             ),
-            hide_index=True,  #  oculta el indice del dataframe
+            hide_index=True,  # oculta el indice del dataframe
         )
 
     with col2:

@@ -59,13 +59,11 @@ if st.button("Refrescar"):
 def obtener_data(file):
     df = read_excel(file)
     df["facturar"] = df["facturar"].apply(lambda x: x == "SI")
-    df2 = df[(df["razon_social"] != "No existe!") & (df["desc_art"] != "No existe!")]
+    df = df[(df["razon_social"] != "No existe!") & (df["desc_art"] != "No existe!")]
     clientes = ClsData(empresa_select).clientes()[["co_cli", "cli_des"]]
     articulos = ClsData(empresa_select).articulos()[["co_art", "art_des"]]
     #  Se combina data de facturación con la tabla clientes
-    merge_data = merge(
-        df2, clientes, how="left", left_on="id_client", right_on="co_cli"
-    )
+    merge_data = merge(df, clientes, how="left", left_on="id_client", right_on="co_cli")
     #  Se combina data de facturación con la tabla artículos
     merge_data2 = merge(
         merge_data, articulos, how="left", left_on="co_art", right_on="co_art"
