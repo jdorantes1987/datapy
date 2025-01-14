@@ -140,6 +140,7 @@ class FacturacionMasiva:
             suc = "01"
         else:
             comentario = ""
+        data_con_iva["fecha_fact"] = data_con_iva["fecha_fact"].dt.strftime("%Y%m%d")
         locale.setlocale(locale.LC_ALL, "es_ES")
         campo5 = to_datetime(date_current).month_name(locale="es_ES")
         locale.setlocale(locale.LC_ALL, "")
@@ -413,11 +414,5 @@ class FacturacionMasiva:
         print("Transacción confirmada.")
 
 
-## Implementación
-# fac_mas = FacturacionMasiva(host='10.100.104.11', data_base='BANTEL_A')
-# strsql = "INSERT INTO saColor (co_color ,des_color ,co_us_in ,co_sucu_in ,fe_us_in ,co_us_mo ,co_sucu_mo ,fe_us_mo) VALUES ('00002' ,'prueba' ,'999' ,'01' ,'2024-04-22' ,'999' ,'01' ,'2024-04-22')"
-# fac_mas.cursor.execute(strsql)
-# strsql2 = "INSERT INTO saColor (co_color ,des_color ,co_us_in ,co_sucu_in ,fe_us_in ,co_us_mo ,co_sucu_mo ,fe_us_mo) VALUES ('00003' ,'prueba' ,'999' ,'01' ,'2024-04-22' ,'999' ,'01' ,'2024-04-22')"
-# fac_mas.cursor.execute(strsql2)
-# fac_mas.gestor.confirmar_transaccion()
-# print("Transacción confirmada.")
+if __name__ == "__main__":
+    pass
