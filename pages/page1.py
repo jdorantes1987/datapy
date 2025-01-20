@@ -1,18 +1,19 @@
 import os
 import time
-import streamlit as st
+from datetime import date, datetime
+from io import BytesIO
 from multiprocessing import Process, Queue
-from datetime import datetime, date
 
 import plotly.graph_objects as go
-
-from consulta_data import ClsData
-from navigation import make_sidebar
+import streamlit as st
+from accesos.files_excel import datos_estadisticas_tasas
 from banco_central.bcv_estadisticas_tasas import (
     actulizar_file_tasas,
     actulizar_file_tasas_manual,
 )
-from accesos.files_excel import datos_estadisticas_tasas
+
+from consulta_data import ClsData
+from navigation import make_sidebar
 
 st.set_page_config(page_title="DataPy: Inicio", layout="wide", page_icon=":vs:")
 
@@ -114,8 +115,8 @@ if __name__ == "__main__":
 
 
 with st.expander("📊  Evolución tasa BCV"):
-    var_tasa = datos_estadisticas_tasas()
-    df = var_tasa[var_tasa["año"] == date.today().year]
+    historico_tasa = datos_estadisticas_tasas()
+    df = historico_tasa[historico_tasa["año"] == date.today().year]
     fig = go.Figure()
     fig = fig.add_trace(
         go.Scatter(
@@ -141,3 +142,35 @@ with st.expander("📊  Evolución tasa BCV"):
     )
     fig.update_xaxes(nticks=13)
     st.plotly_chart(fig, use_container_width=True)
+
+with st.expander("Histórico de tasas"):
+    st.dataframe(
+        historico_tasa[["cod_mon", "fecha", "compra_bid2", "venta_ask2", "var_tasas"]],
+        column_config={
+            "cod_mon": st.column_config.TextColumn(
+                "moneda",
+            ),
+            "compra_bid2": st.column_config.NumberColumn(
+                "compra",
+                format="%.4f",
+            ),
+            "venta_ask2": st.column_config.NumberColumn(
+                "venta",
+                format="%.4f",
+            ),
+            "var_tasas": st.column_config.NumberColumn(
+                "variación",
+                format="%.4f",
+            ),
+            "fecha": st.column_config.DateColumn("fecha", format="DD-MM-YYYY"),
+        },
+        use_container_width=False,
+        hide_index=True,
+    )
+    historico_tasa.to_excel(buf := BytesIO())
+    st.download_button(
+        "Descargar histórico de tasas",
+        buf.getvalue(),
+        "Histórico de tasas BCV.xlsx",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
