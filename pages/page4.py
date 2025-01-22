@@ -223,6 +223,24 @@ def facturar(stage):
     set_stage(stage)
 
 
+def data_validada():
+    df = obtener_data(ruta_archivo)
+    df = df[df["facturar"]]  # Solo los que se van a facturar
+    df_group = (
+        df.groupby(["co_cli", "descrip_encab_fact", "fecha_fact"])
+        .agg({"monto_base": "sum"})
+        .reset_index()
+    )
+    valores_duplicados = df_group[df_group.duplicated(subset=["co_cli"], keep=False)]
+    if not valores_duplicados.empty:
+        st.warning("Existe información inconsistente en la data.")
+        st.write(valores_duplicados)
+        st.stop()
+
+
+data_validada()
+
+
 if st.session_state.stage >= 1 and st.session_state.stage != 3:
     st.button("Facturar", on_click=facturar, args=[3])
 
