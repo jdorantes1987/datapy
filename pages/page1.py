@@ -4,6 +4,7 @@ from datetime import date, datetime
 from io import BytesIO
 from multiprocessing import Process, Queue
 
+import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 import streamlit as st
 from accesos.files_excel import datos_estadisticas_tasas
@@ -144,8 +145,13 @@ with st.expander("📊  Evolución tasa BCV"):
     st.plotly_chart(fig, use_container_width=True)
 
 with st.expander("Histórico de tasas"):
+    cmap = plt.colormaps["YlOrRd"]
     st.dataframe(
-        historico_tasa[["cod_mon", "fecha", "compra_bid2", "venta_ask2", "var_tasas"]],
+        historico_tasa[
+            ["cod_mon", "fecha", "compra_bid2", "venta_ask2", "var_tasas"]
+        ].style.background_gradient(
+            subset=["var_tasas"], cmap=cmap, low=0, vmin=-2, vmax=2, high=1, axis=0
+        ),
         column_config={
             "cod_mon": st.column_config.TextColumn(
                 "moneda",
