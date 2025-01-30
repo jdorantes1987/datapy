@@ -10,7 +10,7 @@ from navigation import make_sidebar
 
 st.set_page_config(page_title="DataPy: Ingresos", layout="wide", page_icon=":vs:")
 
-st.header("Ingresos por año")
+st.title("Ingresos")
 
 
 def local_css(file_name):
@@ -141,7 +141,7 @@ with st.spinner("consultando datos..."):
 
     neto_anio_ant_menos_anio_act = total_ing - total_ing_anio_ant
     with col7:
-        st.write("""#### Ingresos de los últimos 6 meses """)
+        st.write("""##### Gráfica ingresos de los últimos 6 meses """)
         #  Crea un gráfico de lineas con los ultimos 3 meses de ingresos
         ingresos_ultimos_meses = (
             ingresos_por_anio.groupby(["anio", "mes_x"], sort=False)["monto_base_item"]
@@ -181,61 +181,58 @@ with st.spinner("consultando datos..."):
         delta=str("{:,.2f}".format(neto_anio_ant_menos_anio_act)),
     )
 
-    with st.expander("Vendedores"):
-        col11, col12 = st.columns(2, gap="small")
-        with col11:
-            df_ing_x_vend = (
-                df_ing.groupby(["ven_des"], sort=True)["monto_base_item"]
-                .sum()
-                .reset_index()
-            )
-            df_ing_x_vend_sort = df_ing_x_vend.sort_values(
-                by=["monto_base_item"], ascending=[False]
-            )
-            df_ing_x_vend_sort["porcentaje"] = df_ing_x_vend_sort[
-                "monto_base_item"
-            ].apply(lambda x: x / df_ing_x_vend_sort["monto_base_item"].sum())
-            cmap = plt.colormaps["YlGn"]
-            format_dict2 = {
-                "monto_base_item": "{:,.2f}",
-                "porcentaje": "{:.2%}",
-            }  # ejemplo {'sum':'${0:,.0f}', 'date': '{:%m-%Y}', 'pct_of_total': '{:.2%}'}
-            st.dataframe(
-                df_ing_x_vend_sort.style.format(format_dict2).background_gradient(
-                    subset=["monto_base_item"], cmap=cmap
-                ),
-                hide_index=True,
-            )
+    col11, col12 = st.columns(2, gap="small")
+    with col11:
+        st.write("""#### Ingreso por vendedor""")
+        df_ing_x_vend = (
+            df_ing.groupby(["ven_des"], sort=True)["monto_base_item"]
+            .sum()
+            .reset_index()
+        )
+        df_ing_x_vend_sort = df_ing_x_vend.sort_values(
+            by=["monto_base_item"], ascending=[False]
+        )
+        df_ing_x_vend_sort["porcentaje"] = df_ing_x_vend_sort["monto_base_item"].apply(
+            lambda x: x / df_ing_x_vend_sort["monto_base_item"].sum()
+        )
+        cmap = plt.colormaps["YlGn"]
+        format_dict2 = {
+            "monto_base_item": "{:,.2f}",
+            "porcentaje": "{:.2%}",
+        }  # ejemplo {'sum':'${0:,.0f}', 'date': '{:%m-%Y}', 'pct_of_total': '{:.2%}'}
+        st.dataframe(
+            df_ing_x_vend_sort.style.format(format_dict2).background_gradient(
+                subset=["monto_base_item"], cmap=cmap
+            ),
+            hide_index=True,
+        )
 
-        with col12:
-            df_ing_group = (
-                df_ing.groupby(["ven_des", "mes_x"], sort=False)["monto_base_item"]
-                .sum()
-                .reset_index()
-            )
-            vendedores = df_ing_group["ven_des"].unique().tolist()
-            dfs = {
-                vendedor: df_ing_group[df_ing_group["ven_des"] == vendedor]
-                for vendedor in vendedores
-            }  # Crea un diccionario para cada vendedor con sus ingresos por mes
-            fig = go.Figure()
-            for vendedor, df_ing_group in dfs.items():
-                fig = fig.add_trace(
-                    go.Scatter(
-                        x=df_ing_group["mes_x"],
-                        y=df_ing_group["monto_base_item"],
-                        text="Monto",
-                        name=vendedor,
-                    )
+    with col12:
+        df_ing_group = (
+            df_ing.groupby(["ven_des", "mes_x"], sort=False)["monto_base_item"]
+            .sum()
+            .reset_index()
+        )
+        vendedores = df_ing_group["ven_des"].unique().tolist()
+        dfs = {
+            vendedor: df_ing_group[df_ing_group["ven_des"] == vendedor]
+            for vendedor in vendedores
+        }  # Crea un diccionario para cada vendedor con sus ingresos por mes
+        st.write("""##### Gráfica de ingresos por vendedor y mes""")
+        fig = go.Figure()
+        for vendedor, df_ing_group in dfs.items():
+            fig = fig.add_trace(
+                go.Scatter(
+                    x=df_ing_group["mes_x"],
+                    y=df_ing_group["monto_base_item"],
+                    text="Monto",
+                    name=vendedor,
                 )
-            fig.update_traces(textposition="bottom right")
-            fig.update_layout(
-                title="Ingresos por Vendedores",
-                plot_bgcolor="#E6F1F6",
             )
-            st.plotly_chart(fig, use_container_width=True)
+        fig.update_traces(textposition="bottom right")
+        st.plotly_chart(fig, use_container_width=True)
 
-    st.write("🔍 Por cliente")
+    st.write("""#### Ingreso por cliente""")
 
     if seller_select == "Todos":
         datos_ingresos_por_client = (
@@ -266,7 +263,7 @@ with st.spinner("consultando datos..."):
         hide_index=True,
     )
 
-    st.write("""#### Por cliente y mes""")
+    st.write("""##### Por cliente y mes""")
     #  Almacena la lista de meses y clientes
     month_list = df_ing_year["mes_x"].unique().tolist()
     clientes_list = ingresos_por_client["cli_des"].unique().tolist()
