@@ -115,68 +115,67 @@ if __name__ == "__main__":
         st.rerun()
 
 
-with st.expander("📊  Evolución tasa BCV"):
-    historico_tasa = datos_estadisticas_tasas()
-    df = historico_tasa[historico_tasa["año"] == date.today().year]
-    fig = go.Figure()
-    fig = fig.add_trace(
-        go.Scatter(
-            x=df["fecha"].dt.normalize(),
-            y=df["venta_ask2"],
-            mode="lines+markers",  # marcadores puntos
-            marker=dict(  # configura tamaño y color del marcador
-                size=3,
-                color="rgba(255, 217, 102, .9)",
-                line=dict(
-                    color="rgba(191, 70, 0, .8)",  # configura color y tamaño de la linea
-                    width=1,
-                ),
+historico_tasa = datos_estadisticas_tasas()
+df = historico_tasa[historico_tasa["año"] == date.today().year]
+fig = go.Figure()
+fig = fig.add_trace(
+    go.Scatter(
+        x=df["fecha"].dt.normalize(),
+        y=df["venta_ask2"],
+        mode="lines+markers",  # marcadores puntos
+        marker=dict(  # configura tamaño y color del marcador
+            size=3,
+            color="rgba(255, 217, 102, .9)",
+            line=dict(
+                color="rgba(191, 70, 0, .8)",  # configura color y tamaño de la linea
+                width=1,
             ),
-            text="Tasa",
-            name="Tasas",
-        )
-    )
-    fig.update_traces(textposition="bottom right")
-    fig.update_layout(
-        title="Histórico de tasas BCV",
-        plot_bgcolor="#f5fafa",
-    )
-    fig.update_xaxes(nticks=13)
-    st.plotly_chart(fig, use_container_width=True)
-
-with st.expander("Histórico de tasas"):
-    cmap = plt.colormaps["YlOrRd"]
-    st.dataframe(
-        historico_tasa[
-            ["cod_mon", "fecha", "compra_bid2", "venta_ask2", "var_tasas"]
-        ].style.background_gradient(
-            subset=["var_tasas"], cmap=cmap, low=0, vmin=-2, vmax=2, high=1, axis=0
         ),
-        column_config={
-            "cod_mon": st.column_config.TextColumn(
-                "moneda",
-            ),
-            "compra_bid2": st.column_config.NumberColumn(
-                "compra",
-                format="%.4f",
-            ),
-            "venta_ask2": st.column_config.NumberColumn(
-                "venta",
-                format="%.4f",
-            ),
-            "var_tasas": st.column_config.NumberColumn(
-                "variación",
-                format="%.4f",
-            ),
-            "fecha": st.column_config.DateColumn("fecha", format="DD-MM-YYYY"),
-        },
-        use_container_width=False,
-        hide_index=True,
+        text="Tasa",
+        name="Tasas",
     )
-    historico_tasa.to_excel(buf := BytesIO())
-    st.download_button(
-        "Descargar histórico de tasas",
-        buf.getvalue(),
-        "Histórico de tasas BCV.xlsx",
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    )
+)
+fig.update_traces(textposition="bottom right")
+fig.update_layout(
+    title="Histórico de tasas BCV",
+    plot_bgcolor="#f5fafa",
+)
+fig.update_xaxes(nticks=13)
+st.plotly_chart(fig, use_container_width=True)
+
+st.subheader("Histórico de tasas BCV")
+cmap = plt.colormaps["YlOrRd"]
+st.dataframe(
+    historico_tasa[
+        ["cod_mon", "fecha", "compra_bid2", "venta_ask2", "var_tasas"]
+    ].style.background_gradient(
+        subset=["var_tasas"], cmap=cmap, low=0, vmin=-2, vmax=2, high=1, axis=0
+    ),
+    column_config={
+        "cod_mon": st.column_config.TextColumn(
+            "moneda",
+        ),
+        "compra_bid2": st.column_config.NumberColumn(
+            "compra",
+            format="%.4f",
+        ),
+        "venta_ask2": st.column_config.NumberColumn(
+            "venta",
+            format="%.4f",
+        ),
+        "var_tasas": st.column_config.NumberColumn(
+            "variación",
+            format="%.4f",
+        ),
+        "fecha": st.column_config.DateColumn("fecha", format="DD-MM-YYYY"),
+    },
+    use_container_width=False,
+    hide_index=True,
+)
+historico_tasa.to_excel(buf := BytesIO())
+st.download_button(
+    "Descargar histórico de tasas",
+    buf.getvalue(),
+    "Histórico de tasas BCV.xlsx",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+)
