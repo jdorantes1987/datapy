@@ -185,10 +185,7 @@ with st.spinner("consultando datos..."):
                     y=saldo_por_intervalo["saldo_total_doc"],
                     text=saldo_por_intervalo["saldo_total_doc"].apply("{:,.2f}".format),
                     textposition="auto",
-                    marker={
-                        "color": list(range(2, 12)),  # color de las barras
-                        "colorscale": "Oranges",  # escala de colores
-                    },  # color de las barras
+                    marker_color="rgba(226, 182, 186, .9)",
                 )
             ]
         )
