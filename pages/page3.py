@@ -2,6 +2,7 @@ import locale
 from io import BytesIO
 
 import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 import streamlit as st
 from pandas import merge
 
@@ -44,6 +45,11 @@ def data_facturacion(empresa, usd):
     df["mes_x"] = df["fec_reg"].dt.month_name(locale="es_ES").str[:3]
     locale.setlocale(locale.LC_ALL, "")
     return df
+
+
+@st.cache_data
+def facturacion_saldo_x_intervalo_dias(empresa, usd):
+    return ClsData(empresa).facturacion_saldo_x_intervalo_dias(usd=usd)
 
 
 with st.spinner("consultando datos..."):
@@ -122,9 +128,9 @@ with st.spinner("consultando datos..."):
         "Total por cobrar": "{:,.2f}",
         "por cobrar": "{:.2%}",
     }  # ejemplo {'sum':'${0:,.0f}', 'date': '{:%m-%Y}', 'pct_of_total': '{:.2%}'}
-    col1, col2 = st.columns(2)
 
-    with col1:
+    col31, col32, col33 = st.columns(3, gap="small")
+    with col31:
         fact_x_cobrar_group_anio_y_mes = (
             ctas_x_cobrar_por_anio_y_seller.groupby(["anio", "mes"], sort=False)[
                 ["saldo_total_doc"]
@@ -167,45 +173,78 @@ with st.spinner("consultando datos..."):
             hide_index=True,  # oculta el indice del dataframe
         )
 
-    with col2:
+    with col32:
+        st.write("""##### Vencimiento de documentos por intervalo de días""")
+        saldo_por_intervalo = facturacion_saldo_x_intervalo_dias(
+            select_emp, usd=conv_usd
+        )
+        fig = go.Figure(
+            data=[
+                go.Bar(
+                    x=saldo_por_intervalo["intervalo"],
+                    y=saldo_por_intervalo["saldo_total_doc"],
+                    text=saldo_por_intervalo["saldo_total_doc"].apply("{:,.2f}".format),
+                    textposition="auto",
+                    marker={
+                        "color": list(range(2, 12)),  # color de las barras
+                        "colorscale": "Oranges",  # escala de colores
+                    },  # color de las barras
+                )
+            ]
+        )
+        fig.update_layout(
+            barmode="stack",  # apila las barras
+            xaxis_type="category",  # tipo de eje x
+            annotations=[
+                dict(
+                    x=0.5,
+                    y=-0.15,
+                    showarrow=False,  # sin flecha
+                    text="Vencimiento",
+                    xref="paper",
+                    yref="paper",
+                )
+            ],
+        )
+        st.plotly_chart(fig, use_container_width=True)
+
+    with col33:
         anio_select = "all" if anio_select == "todos" else anio_select
         seller_select = "all" if seller_select == "todos" else seller_select
         #  total ingresos incluyendo iva + igtf
         total_ing = ctas_x_cobrar_con_ingresos["Total facturacion"].sum()
         # total por cobrar
         total_x_cob = ctas_x_cobrar_con_ingresos["Total por cobrar"].sum()
-
-        porcentaje = -(total_x_cob / total_ing) * 100
-        col2.metric(label="Total Facturación", value="{:,.2f}".format(total_ing))
-
-        col2.metric(
+        porcentaje = (total_x_cob / total_ing) * 100
+        col33.metric(label="Total Facturación", value="{:,.2f}".format(total_ing))
+        col33.metric(
             label="Total por cobrar",
             value="{:,.2f}".format(total_x_cob),
             delta=str("{:,.2f}".format(porcentaje) + "%"),
-            delta_color="normal",
+            delta_color="off",
         )
 
-    with st.expander("Resumen de cuentas por cobrar clientes"):
-        datos = cuentas_por_cobrar_pivot(
-            empresa=select_emp,
-            anio=anio_select,
-            mes="all",
-            usd=conv_usd,
-            vendedor=seller_select,
-        )
-        saldo_facturas = datos.sort_values(by=["All"], ascending=False)
-        cmap = plt.colormaps["BuGn"]
-        st.dataframe(
-            saldo_facturas.style.format("{:,.2f}").background_gradient(
-                subset=["All"], cmap=cmap
-            ),
-            #  Permite ajustar el ancho al tamaño del contenedor
-            use_container_width=True,
-        )
-        saldo_facturas.to_excel(buf := BytesIO())
-        st.download_button(
-            "Download file",
-            buf.getvalue(),
-            f"Cobranza {ClsEmpresa.modulo()}.xlsx",
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        )
+
+datos = cuentas_por_cobrar_pivot(
+    empresa=select_emp,
+    anio=anio_select,
+    mes="all",
+    usd=conv_usd,
+    vendedor=seller_select,
+)
+saldo_facturas = datos.sort_values(by=["All"], ascending=False)
+cmap = plt.colormaps["BuGn"]
+st.dataframe(
+    saldo_facturas.style.format("{:,.2f}").background_gradient(
+        subset=["All"], cmap=cmap
+    ),
+    #  Permite ajustar el ancho al tamaño del contenedor
+    use_container_width=True,
+)
+saldo_facturas.to_excel(buf := BytesIO())
+st.download_button(
+    "Download file",
+    buf.getvalue(),
+    f"Cobranza {ClsEmpresa.modulo()}.xlsx",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+)
