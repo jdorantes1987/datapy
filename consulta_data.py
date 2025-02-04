@@ -81,6 +81,9 @@ class ClsData:
     def get_fecha_tasa_bcv_dia(self):
         return self.odata.get_fecha_tasa_bcv_del_dia()
 
+    def facturacion_saldo_x_intervalo_dias(self, usd):
+        return self.odata.facturacion_saldo_x_intervalo_dias(usd=usd)
+
     @audit
     def ultimo_plan_facturado(self):
         articulos = self.articulos()[["co_art", "art_des"]]
