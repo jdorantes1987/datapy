@@ -117,11 +117,11 @@ if __name__ == "__main__":
                 st.info("Tasa BCV actualizada!")
         st.rerun()
 
-options = ["Todos", anio_actual]
-data_select = st.pills("Datos", options, default=anio_actual, selection_mode="single")
-st.session_state["data_select"] = data_select
-
 data_historico_tasa = datos_estadisticas_tasas()
+year_list = data_historico_tasa["año"].unique().tolist()  # Lista de todos los años
+year_list.insert(0, "Todos")
+data_select = st.pills("Datos", year_list, default=anio_actual, selection_mode="single")
+st.session_state["data_select"] = data_select
 filter_data_tasas = (
     (data_historico_tasa["año"] == st.session_state["data_select"])
     if st.session_state["data_select"] != "Todos"
