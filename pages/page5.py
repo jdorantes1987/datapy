@@ -84,7 +84,7 @@ with st.expander("🔍 Grupos por cliente"):
     else:
         grupo = grupo_filtrado
 
-    st.write(f"{len(grupo)} clientes")
+    st.write(f":blue[{len(grupo)} cliente(s)]")
     st.dataframe(grupo, use_container_width=True, hide_index=True)
 
 #  CLIENTES POR REGISTRAR EN MIKROWISP
