@@ -1,5 +1,5 @@
 import locale
-
+from datetime import date
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 import streamlit as st
@@ -11,6 +11,10 @@ from navigation import make_sidebar
 st.set_page_config(page_title="DataPy: Ingresos", layout="wide", page_icon=":vs:")
 
 st.title("Ingresos")
+anio_actual = date.today().year
+
+if "anio_select_ventas" not in st.session_state:
+    st.session_state["anio_select_ventas"] = date.today().year
 
 
 def local_css(file_name):
@@ -66,14 +70,20 @@ with st.spinner("consultando datos..."):
         .sum()
         .reset_index()
     )
-    # Almacena la lista de años
-    year_list = ingresos_por_anio["anio"].unique().tolist()
 
     with col4:
-        #  Crea un selectbox que contenga todos los años.
-        anio_select = st.selectbox("Elije un año:", year_list, int(len(year_list) - 1))
+        year_list = (
+            ingresos_por_anio["anio"].unique().tolist()
+        )  # Lista de todos los años
+        anio_select = st.pills(
+            "Periodos:",
+            sorted(year_list, reverse=True),
+            default=str(anio_actual),
+            selection_mode="single",
+        )
+        st.session_state["anio_select_ventas"] = anio_select
         sellers_anio = ingresos_por_anio[
-            ingresos_por_anio["anio"] == anio_select
+            ingresos_por_anio["anio"] == st.session_state["anio_select_ventas"]
         ].copy()
 
     with col5:
