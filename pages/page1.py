@@ -19,6 +19,9 @@ from navigation import make_sidebar
 st.set_page_config(page_title="DataPy: Inicio", layout="wide", page_icon=":vs:")
 
 st.header("Información")
+anio_actual = date.today().year
+if "data_select" not in st.session_state:
+    st.session_state["data_select"] = date.today().year
 
 
 def archivo_xlsx_bcv_actualizado():
@@ -114,14 +117,22 @@ if __name__ == "__main__":
                 st.info("Tasa BCV actualizada!")
         st.rerun()
 
+options = ["Todos", anio_actual]
+data_select = st.pills("Datos", options, default=anio_actual, selection_mode="single")
+st.session_state["data_select"] = data_select
 
-historico_tasa = datos_estadisticas_tasas()
-df = historico_tasa[historico_tasa["año"] == date.today().year]
+data_historico_tasa = datos_estadisticas_tasas()
+filter_data_tasas = (
+    (data_historico_tasa["año"] == st.session_state["data_select"])
+    if st.session_state["data_select"] != "Todos"
+    else (data_historico_tasa["año"] > 0)
+)
+df_hist_tasas = data_historico_tasa[filter_data_tasas]
 fig = go.Figure()
 fig = fig.add_trace(
     go.Scatter(
-        x=df["fecha"].dt.normalize(),
-        y=df["venta_ask2"],
+        x=df_hist_tasas["fecha"].dt.normalize(),
+        y=df_hist_tasas["venta_ask2"],
         mode="lines+markers",  # marcadores puntos
         marker=dict(  # configura tamaño y color del marcador
             size=3,
@@ -146,7 +157,7 @@ st.plotly_chart(fig, use_container_width=True)
 st.subheader("Histórico de tasas BCV")
 cmap = plt.colormaps["YlOrRd"]
 st.dataframe(
-    historico_tasa[
+    df_hist_tasas[
         ["cod_mon", "fecha", "compra_bid2", "venta_ask2", "var_tasas"]
     ].style.background_gradient(
         subset=["var_tasas"], cmap=cmap, low=0, vmin=-2, vmax=2, high=1, axis=0
@@ -172,7 +183,8 @@ st.dataframe(
     use_container_width=False,
     hide_index=True,
 )
-historico_tasa.to_excel(buf := BytesIO())
+
+df_hist_tasas.to_excel(buf := BytesIO())
 st.download_button(
     "Descargar histórico de tasas",
     buf.getvalue(),
