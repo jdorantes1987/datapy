@@ -21,7 +21,7 @@ st.set_page_config(page_title="DataPy: Inicio", layout="wide", page_icon=":vs:")
 st.header("Información")
 anio_actual = date.today().year
 if "data_select" not in st.session_state:
-    st.session_state["data_select"] = date.today().year
+    st.session_state["data_select"] = anio_actual
 
 
 def archivo_xlsx_bcv_actualizado():
