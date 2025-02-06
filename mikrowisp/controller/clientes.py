@@ -29,8 +29,8 @@ class Gestor:
         return df[~df["inactivo"]]
 
     def __cod_clientes_x_registrar_en_mikrowisp(self):
-        clientes_mkwps = self.clientes_mikrowisp()
-        clientes_bantel = self.clientes_profit()
+        clientes_mkwps = self.clientes_mikrowisp()[["codigo_cliente"]]
+        clientes_bantel = self.clientes_profit()[["co_cli"]]
         cod_clientes_mkwsp = set(clientes_mkwps["codigo_cliente"])
         cod_clientes_bantel = set(clientes_bantel["co_cli"])
         return cod_clientes_bantel - cod_clientes_mkwsp
@@ -275,7 +275,7 @@ class Gestor:
 
 if __name__ == "__main__":
     g = Gestor("BANTEL_A")
-    print(g.datos_clientes_nodo_por_sinc_mikrowisp_profit())
-    print(g.datos_clientes_por_sinc_profit_mikrowisp())
+    # print(g.datos_clientes_nodo_por_sinc_mikrowisp_profit())
+    # print(g.datos_clientes_por_sinc_profit_mikrowisp())
     datos_mkwps = g.clientes_mikrowisp()
     print(datos_mkwps)
