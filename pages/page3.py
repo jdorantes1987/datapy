@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 import streamlit as st
 from pandas import merge
+from datetime import date
 
 from consulta_data import ClsData
 from empresa import ClsEmpresa
@@ -15,6 +16,9 @@ st.set_page_config(
 )
 
 st.header("Resumen de Cuentas por Cobrar")
+anio_actual = date.today().year
+if "data_select" not in st.session_state:
+    st.session_state["data_select"] = anio_actual
 
 
 @st.cache_data
@@ -93,17 +97,22 @@ with st.spinner("consultando datos..."):
     datos_fact_x_cobrar = cuentas_por_cobrar_agrupadas(
         empresa=select_emp, anio="all", mes="all", usd=conv_usd, vendedor="all"
     )
-    # Almacena la lista de años
-    year_list = datos_fact_x_cobrar["anio"].unique().tolist()
+    year_list = sorted(
+        datos_fact_x_cobrar["anio"].unique().tolist(), reverse=True
+    )  # Lista de todos los años
+    year_list.insert(0, "Todos")
+
     sellers_list = datos_fact_x_cobrar["ven_des"].unique().tolist()
-    year_list.append("todos")
-    sellers_list.append("todos")
+    sellers_list.append("Todos")
 
     with col4:
-        # Crea un selectbox que contenga todos los años
-        anio_select = st.selectbox(
-            "Elije un año:", year_list, index=int(len(year_list) - 1)
+        data_select = st.pills(
+            "Periodos:",
+            year_list,
+            default="Todos",
+            selection_mode="single",
         )
+        st.session_state["data_select"] = data_select
 
     with col43:
         # Crea un selectbox que contenga todos los años
@@ -111,14 +120,14 @@ with st.spinner("consultando datos..."):
             "Elije un vendedor:", sellers_list, index=int(len(sellers_list) - 1)
         )
 
-    filter_year = datos_fact_x_cobrar["anio"] == anio_select
-    if anio_select == "todos":
+    filter_year = datos_fact_x_cobrar["anio"] == data_select
+    if data_select == "Todos":
         ctas_x_cobrar_por_anio = datos_fact_x_cobrar
     else:
         ctas_x_cobrar_por_anio = datos_fact_x_cobrar[filter_year]
 
     filter_seller = ctas_x_cobrar_por_anio["ven_des"] == seller_select
-    if seller_select == "todos":
+    if seller_select == "Todos":
         ctas_x_cobrar_por_anio_y_seller = ctas_x_cobrar_por_anio
     else:
         ctas_x_cobrar_por_anio_y_seller = ctas_x_cobrar_por_anio[filter_seller]
@@ -206,8 +215,12 @@ with st.spinner("consultando datos..."):
         st.plotly_chart(fig, use_container_width=True)
 
     with col33:
-        anio_select = "all" if anio_select == "todos" else anio_select
-        seller_select = "all" if seller_select == "todos" else seller_select
+        anio_select = (
+            "all"
+            if st.session_state["data_select"] == "Todos"
+            else st.session_state["data_select"]
+        )
+        seller_select = "all" if seller_select == "Todos" else seller_select
         #  total ingresos incluyendo iva + igtf
         total_ing = ctas_x_cobrar_con_ingresos["Total facturacion"].sum()
         # total por cobrar
