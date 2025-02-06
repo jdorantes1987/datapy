@@ -107,7 +107,7 @@ if len(st.session_state.datos_clientes_por_sinc_mkwsp) > 0:
             st.rerun()
 
 #  DATOS POR ACTUALIZAR EN MIKROWISP
-clientes_a_ignorar = set(datos_clientes_por_registrar()["co_cli"])
+clientes_a_ignorar = set(st.session_state.datos_clientes_por_sinc_mkwsp["co_cli"])
 datos_clientes_por_sinc = datos_clientes_por_sinc_profit_mikrowisp()
 datos_clientes_por_sinc_sin_clientes_por_agregar = datos_clientes_por_sinc[
     ~datos_clientes_por_sinc["co_cli"].isin(clientes_a_ignorar)
