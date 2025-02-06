@@ -245,6 +245,7 @@ if st.session_state.stage >= 1 and st.session_state.stage != 3:
     st.button("Facturar", on_click=facturar, args=[3])
 
 if st.session_state.stage == 4:
+    set_stage(0)
     st.switch_page("pages/page2.py")
 
 
