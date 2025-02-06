@@ -43,7 +43,7 @@ def lista_grupos_clientes(empresa):
 
 @st.cache_data
 def clientes(empresa):
-    return ClsData(empresa).clientes()
+    return ClsData(empresa).clientes()[["co_cli", "matriz"]]
 
 
 @st.cache_data
@@ -88,12 +88,12 @@ with st.expander("🔍 Grupos por cliente"):
     st.dataframe(grupo, use_container_width=True, hide_index=True)
 
 #  CLIENTES POR REGISTRAR EN MIKROWISP
-st.session_state.datos_clientes_por_sinc_mkwsp = datos_clientes_por_registrar()
-if len(st.session_state.datos_clientes_por_sinc_mkwsp) > 0:
+datos_clientes_por_sinc_mkwsp = datos_clientes_por_registrar()
+if len(datos_clientes_por_sinc_mkwsp) > 0:
     st.write("📗 Clientes en Profit por registrar en Mikrowisp")
     with st.expander("agregar"):
         st.dataframe(
-            st.session_state.datos_clientes_por_sinc_mkwsp,
+            datos_clientes_por_sinc_mkwsp,
             use_container_width=True,
             hide_index=True,
         )
@@ -103,23 +103,20 @@ if len(st.session_state.datos_clientes_por_sinc_mkwsp) > 0:
             st.info("Cliente registrado con éxito!")
             time.sleep(1)
             st.cache_data.clear()
-            del st.session_state["datos_clientes_por_sinc_mkwsp"]
             st.rerun()
 
 #  DATOS POR ACTUALIZAR EN MIKROWISP
-clientes_a_ignorar = set(st.session_state.datos_clientes_por_sinc_mkwsp["co_cli"])
+clientes_a_ignorar = set(datos_clientes_por_sinc_mkwsp["co_cli"])
 datos_clientes_por_sinc = datos_clientes_por_sinc_profit_mikrowisp()
 datos_clientes_por_sinc_sin_clientes_por_agregar = datos_clientes_por_sinc[
     ~datos_clientes_por_sinc["co_cli"].isin(clientes_a_ignorar)
 ]
-st.session_state.datos_clientes_por_sinc_prof = (
-    datos_clientes_por_sinc_sin_clientes_por_agregar
-)
-if len(st.session_state.datos_clientes_por_sinc_prof) > 0:
+datos_clientes_por_sinc_prof = datos_clientes_por_sinc_sin_clientes_por_agregar
+if len(datos_clientes_por_sinc_prof) > 0:
     st.write("⚡ Clientes por actualizar en Mikrowisp desde Profit")
     with st.expander("datos"):
         st.dataframe(
-            st.session_state.datos_clientes_por_sinc_prof,
+            datos_clientes_por_sinc_prof,
             use_container_width=True,
             hide_index=True,
         )
@@ -128,17 +125,14 @@ if len(st.session_state.datos_clientes_por_sinc_prof) > 0:
             st.info("Cliente actualizado con éxito en Mikrowisp!")
             time.sleep(1)
             st.cache_data.clear()
-            del st.session_state["datos_clientes_por_sinc_prof"]
             st.rerun()
 
-st.session_state.datos_clientes_por_act_nodo = (
-    datos_clientes_nodo_por_sinc_mikrowisp_profit()
-)
-if len(st.session_state.datos_clientes_por_act_nodo) > 0:
+datos_clientes_por_act_nodo = datos_clientes_nodo_por_sinc_mikrowisp_profit()
+if len(datos_clientes_por_act_nodo) > 0:
     st.write("🔄 Clientes por actualizar nodo en Profit")
     with st.expander("datos"):
         st.dataframe(
-            st.session_state.datos_clientes_por_act_nodo,
+            datos_clientes_por_act_nodo,
             use_container_width=True,
             hide_index=True,
         )
