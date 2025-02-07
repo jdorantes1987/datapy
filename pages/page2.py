@@ -193,7 +193,7 @@ with st.spinner("consultando datos..."):
 
     col11, col12 = st.columns(2, gap="small")
     with col11:
-        st.write("""#### Ingreso por vendedor""")
+        st.write("""#### Ingresos por vendedor""")
         df_ing_x_vend = (
             df_ing.groupby(["ven_des"], sort=True)["monto_base_item"]
             .sum()
@@ -242,7 +242,7 @@ with st.spinner("consultando datos..."):
         fig.update_traces(textposition="bottom right")
         st.plotly_chart(fig, use_container_width=True)
 
-    st.write("""#### Ingreso por cliente""")
+    st.write("""#### Ingresos por cliente""")
 
     if seller_select == "Todos":
         datos_ingresos_por_client = (
