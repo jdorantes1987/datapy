@@ -140,5 +140,4 @@ if len(datos_clientes_por_act_nodo) > 0:
             g.sinc_datos_clientes_nodos()
             st.info("Cliente actualizado con éxito en Profit!")
             st.cache_data.clear()
-            del st.session_state["datos_clientes_por_act_nodo"]
             st.rerun()
