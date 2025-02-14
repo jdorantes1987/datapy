@@ -43,7 +43,7 @@ def lista_grupos_clientes(empresa):
 
 @st.cache_data
 def clientes(empresa):
-    return ClsData(empresa).clientes()[["co_cli", "matriz"]]
+    return ClsData(empresa).clientes()
 
 
 @st.cache_data
