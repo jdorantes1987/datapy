@@ -42,7 +42,7 @@ def insert_roles(user, data_roles):
     gestor_trasacc.iniciar_transaccion()
     cursor = gestor_trasacc.get_cursor()
 
-    sql = "DELETE from usuarios_roles WHERE idusuario = '{user}'"
+    sql = f"DELETE from usuarios_roles WHERE idusuario = '{user}'"
     cursor.execute(sql)
 
     for index, row in data_roles.iterrows():
