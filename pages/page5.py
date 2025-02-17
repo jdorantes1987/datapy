@@ -25,22 +25,6 @@ with col1:
         st.cache_data.clear()
 
 
-def lista_grupos_clientes(empresa):
-    #  Expresión regular para ubicar los clientes AGRUPADOS que tiene guion (-) ejemplo: CL39-4
-    patron = r"[A-Za-z]{2}\d{1,3}-\d{1,3}"
-    clientes = ClsData(empresa).clintes_search(str_search=patron, resumir_info=True)
-    grupos = set(clientes["matriz"])
-    #  Trata de eliminar el elemento None (no existe) con discard()
-    #  No hace nada
-    grupos.discard(None)
-    clientes_grupos = clientes[(clientes["co_cli"].isin(grupos))].copy()
-    clientes_grupos_sort = clientes_grupos.sort_values(by="cli_des", ascending=True)
-    clientes_grupos_sort["buscar_cliente"] = (
-        clientes_grupos_sort["co_cli"] + " | " + clientes_grupos_sort["cli_des"]
-    )
-    return clientes_grupos_sort["buscar_cliente"].tolist()
-
-
 @st.cache_data
 def clientes(empresa):
     return ClsData(empresa).clientes()
@@ -66,26 +50,39 @@ def sinc_datos_clientes_nodos():
     return g.sinc_datos_clientes_nodos()
 
 
-with st.expander("🔍 Grupos por cliente"):
-    grupo_select = str(
-        st.selectbox(
-            "Elije un grupo:", lista_grupos_clientes(empresa=company_selected), 0
-        )
-    ).replace(" ", "")
-    df_clientes = clientes(company_selected)
-    id_grupo = grupo_select.split("|")[0]
-    grupo_filtrado = df_clientes[df_clientes["matriz"] == id_grupo].copy()
-    if company_selected == os.getenv("DB_NAME_IZQUIERDA_PROFIT"):
-        grupo_filtrado["co_cli_sort"] = grupo_filtrado["co_cli"].str.split(
-            "-", expand=True
-        )[1]
-        grupo_filtrado["co_cli_sort"] = grupo_filtrado["co_cli_sort"].astype("int64")
-        grupo = grupo_filtrado.sort_values(by="co_cli_sort", ascending=False)
-    else:
-        grupo = grupo_filtrado
+def lista_grupos_clientes(empresa):
+    gp_clientes = clientes(empresa)
+    # Filtra los registros que no son nulos
+    gp_clientes = gp_clientes[gp_clientes["tipo_adi"] == 2]
+    gp_clientes = gp_clientes.sort_values(by="cli_des", ascending=True)
+    gp_clientes["buscar_cliente"] = (
+        gp_clientes["co_cli"] + " | " + gp_clientes["cli_des"]
+    )
+    return gp_clientes["buscar_cliente"].tolist()
 
-    st.write(f":blue[{len(grupo)} cliente(s)]")
-    st.dataframe(grupo, use_container_width=True, hide_index=True)
+
+with st.expander("🔍 Grupos por cliente"):
+    data_lista_clientes = lista_grupos_clientes(empresa=company_selected)
+    grupo_select = str(st.selectbox("Elije un grupo:", data_lista_clientes, 0)).replace(
+        " ", ""
+    )
+    if len(data_lista_clientes) > 0:
+        df_clientes = clientes(company_selected)
+        id_grupo = grupo_select.split("|")[0]
+        grupo_filtrado = df_clientes[df_clientes["matriz"] == id_grupo].copy()
+        if company_selected == os.getenv("DB_NAME_IZQUIERDA_PROFIT"):
+            grupo_filtrado["co_cli_sort"] = grupo_filtrado["co_cli"].str.split(
+                "-", expand=True
+            )[1]
+            grupo_filtrado["co_cli_sort"] = grupo_filtrado["co_cli_sort"].astype(
+                "int64"
+            )
+            grupo = grupo_filtrado.sort_values(by="co_cli_sort", ascending=False)
+        else:
+            grupo = grupo_filtrado
+
+        st.write(f":blue[{len(grupo)} cliente(s)]")
+        st.dataframe(grupo, use_container_width=True, hide_index=True)
 
 #  CLIENTES POR REGISTRAR EN MIKROWISP
 datos_clientes_por_sinc_mkwsp = datos_clientes_por_registrar()
