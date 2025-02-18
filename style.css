@@ -141,10 +141,10 @@
 .ui.five.statistics {
   margin: 0 0 -1em
 }
-
+/* Para ajustar el espaciado de la información de la tasa de cambio 20%  margin: 0 1 1em para ajustar la separación*/
 .ui.five.statistics .statistic {
   min-width: 20%;
-  margin: 0 0 1em
+  margin: 0 1 1em
 }
 
 .ui.four.statistics {
