@@ -41,6 +41,9 @@ def make_sidebar():
             st.switch_page("app.py")
 
 
+modulo = ClsEmpresa.modulo()
+
+
 # TODO Rename this here and in `make_sidebar`
 def _extracted_from_make_sidebar():
     if (
@@ -67,14 +70,13 @@ def _extracted_from_make_sidebar():
     elif ur.ClsUsuariosRoles.roles().get("Izquierda", 0)[1] == 0:
         l_modulos.pop(1)
 
-    indice_mod = l_modulos.index(st.session_state["modulo"])
+    indice_mod = l_modulos.index(modulo)
     empresa_select = st.selectbox(
         "Seleccione la empresa:",
         l_modulos,
         index=indice_mod,
         on_change=al_cambiar_empresa,
     )
-
     ClsEmpresa(empresa_select, False)
 
     if st.button("Cerrar sesión"):
@@ -84,11 +86,6 @@ def _extracted_from_make_sidebar():
 def al_cambiar_empresa():
     st.cache_data.clear()
     st.session_state.stage = 0
-    if st.session_state["modulo"] == "Izquierda":
-        st.session_state.modulo = "Derecha"
-    else:
-        st.session_state.modulo = "Izquierda"
-
     if "data_masiva" in st.session_state:
         del st.session_state["data_masiva"]
     elif "datos_clientes_por_sinc_prof" in st.session_state:
