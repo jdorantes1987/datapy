@@ -24,6 +24,9 @@ def ultimo_plan_facturado(empresa):
     return ClsData(empresa).ultimo_plan_facturado()
 
 
+if st.button("Refrescar"):
+    st.cache_data.clear()
+
 tab1, tab2 = st.tabs(["👨‍🏫 Clientes", "🧾 Planes facturados"])
 
 with tab1:
