@@ -71,15 +71,8 @@ def _extracted_from_make_sidebar():
         "Seleccione la empresa:",
         l_modulos,
         index=indice_mod,
-        on_change=al_cambiar_empresa,
     )
     ClsEmpresa(empresa_select, False)
-
-    if st.button("Cerrar sesión"):
-        logout()
-
-
-def al_cambiar_empresa():
     st.cache_data.clear()
     st.session_state.stage = 0
     if "data_masiva" in st.session_state:
@@ -88,6 +81,9 @@ def al_cambiar_empresa():
         del st.session_state["datos_clientes_por_sinc_prof"]
     elif "datos_clientes_por_sinc_prof" in st.session_state:
         del st.session_state["df_clientes"]
+
+    if st.button("Cerrar sesión"):
+        logout()
 
 
 def logout():
