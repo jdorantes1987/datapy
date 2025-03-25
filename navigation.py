@@ -65,12 +65,9 @@ def _extracted_from_make_sidebar():
         l_modulos.pop(0)
     elif ur.ClsUsuariosRoles.roles().get("Izquierda", 0)[1] == 0:
         l_modulos.pop(1)
-    modulo = ClsEmpresa.modulo()
-    indice_mod = l_modulos.index(modulo)
     empresa_select = st.selectbox(
         "Seleccione la empresa:",
         l_modulos,
-        index=indice_mod,
     )
     ClsEmpresa(empresa_select, False)
     st.cache_data.clear()
