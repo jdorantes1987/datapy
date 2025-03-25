@@ -44,6 +44,7 @@ def login(user, passw):
         st.session_state["refrescar_facturacion"] = False
         sleep(0.5)
         user_roles = roles()
+        # Define el módulo por defecto
         modulo = "Izquierda" if user_roles.get("Izquierda", 0)[1] == 1 else "Derecha"
         ClsEmpresa(modulo, False)
         st.switch_page(MENU_INICIO)
