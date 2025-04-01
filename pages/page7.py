@@ -30,15 +30,15 @@ def usuarios():
     return get_users()
 
 
-if "stage" not in st.session_state:
-    st.session_state.stage = 0
+if "stage7" not in st.session_state:
+    st.session_state.stage7 = 0
 
 
 def set_stage(i):
-    st.session_state.stage = i
+    st.session_state.stage7 = i
 
 
-if st.session_state.stage == 0:
+if st.session_state.stage7 == 0:
     st.session_state.w_id = ""
     st.session_state.w_nombre = ""
     st.session_state.w_pw = ""
@@ -48,6 +48,7 @@ if st.session_state.stage == 0:
 st.title("Gestion de Usuarios")
 
 df_users = usuarios()
+print(st.session_state.w_id)
 
 
 def agregar_usuario(id_user, nombre, password, stage):
@@ -91,7 +92,6 @@ if roles.get("Admin", 0)[1] == 1:
             key="w_id",
             placeholder="ingrese el id. usuario",
         )
-
         nombre = st.text_input(
             label="nombre",
             disabled=False,
