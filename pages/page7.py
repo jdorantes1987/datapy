@@ -48,7 +48,6 @@ if st.session_state.stage7 == 0:
 st.title("Gestion de Usuarios")
 
 df_users = usuarios()
-print(st.session_state.w_id)
 
 
 def agregar_usuario(id_user, nombre, password, stage):
