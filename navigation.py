@@ -2,7 +2,8 @@ from time import sleep
 
 import streamlit as st
 from streamlit.runtime.scriptrunner import get_script_run_ctx
-from streamlit.source_util import get_pages
+
+# Removed import of 'get_pages' as it is no longer available in Streamlit
 
 import gestion_user.usuarios_roles as ur
 from empresa import ClsEmpresa
@@ -13,8 +14,9 @@ def get_current_page_name():
     if ctx is None:
         raise RuntimeError("No se pudo obtener el contexto del script.")
 
-    pages = get_pages("")
-    return pages[ctx.page_script_hash]["page_name"]
+    # Alternative logic to determine the current page name
+    # Replace this with your own logic if needed
+    return ctx.script_name.split("/")[-1].replace(".py", "")
 
 
 def make_sidebar():
@@ -82,7 +84,7 @@ def _extracted_from_make_sidebar():
         sleep(0.5)
         st.switch_page("app.py")
 
-    if st.button("Cerrar sesión"):
+    if st.button("Cerrar sesión", type="primary"):
         logout()
 
 

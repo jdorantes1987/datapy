@@ -91,31 +91,43 @@ if roles.get("Admin", 0)[1] == 1:
             key="w_id",
             placeholder="ingrese el id. usuario",
         )
-        nombre = st.text_input(
-            label="nombre",
-            disabled=False,
-            key="w_nombre",
-            placeholder="Ingrese el nombre y apellido",
-        )
+        if len(id_user) > 0:
+            existe_usuario = existe_user(id_user)
+            if not existe_usuario:
+                nombre = st.text_input(
+                    label="nombre",
+                    disabled=False,
+                    key="w_nombre",
+                    placeholder="Ingrese el nombre y apellido",
+                )
 
-        password = st.text_input(
-            "Enter a password",
-            type="password",
-            key="w_pw",
-        )
+                password = st.text_input(
+                    "Enter a password",
+                    type="password",
+                    key="w_pw",
+                )
 
-        if len(id_user) and len(nombre) and len(password) and not existe_user(id_user):
-            st.button(
-                "agregar nuevo usuario",
-                on_click=agregar_usuario,
-                args=[id_user, nombre, password, 0],
-            )
-            st.info("Datos validados!")
-        else:
-            if existe_user(id_user):
-                st.error(f"Ya existe el usuario {id_user} en la base de datos.")
+                if len(id_user) and len(nombre) and len(password):
+                    st.button(
+                        "agregar nuevo usuario",
+                        on_click=agregar_usuario,
+                        args=[id_user, nombre, password, 0],
+                    )
+                    st.badge(
+                        label="Datos ingresados correctamente",
+                        color="green",
+                    )
+                else:
+                    st.badge(
+                        label="Usuario disponible",
+                        color="blue",
+                    )
+                    st.warning("Debe ingresar los demás datos solicitados.")
             else:
-                st.warning("Debe ingresar todos los datos solicitados.")
+                st.badge(
+                    label=f"⚠️ {id_user} ya existe en la base de datos",
+                    color="orange",
+                )
 
     if roles.get("Admin", 0)[1] == 1:
         with st.expander("agregar roles usuario"):
