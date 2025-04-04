@@ -60,31 +60,40 @@ def _extracted_from_make_sidebar():
 
     st.write("\n" * 2)
     l_modulos = ["Derecha", "Izquierda"]
+
     # administra el acceso del usuario a los módulos
     if ur.ClsUsuariosRoles.roles().get("Derecha", 0)[1] == 0:
         l_modulos.pop(0)
     elif ur.ClsUsuariosRoles.roles().get("Izquierda", 0)[1] == 0:
         l_modulos.pop(1)
+
     empresa_select = st.selectbox(
         "Seleccione la empresa:",
         l_modulos,
+        index=l_modulos.index(ClsEmpresa.modulo()),
+        key="emp_select",
+        on_change=al_cambiar_empresa,
     )
     ClsEmpresa(empresa_select, False)
+
+    def logout():
+        st.session_state.logged_in = False
+        st.info("Se ha cerrado la sesión con éxito!")
+        sleep(0.5)
+        st.switch_page("app.py")
+
+    if st.button("Cerrar sesión"):
+        logout()
+
+
+def al_cambiar_empresa():
     st.cache_data.clear()
-    st.session_state.stage = 0
+    if "emp_select" in st.session_state:
+        ClsEmpresa(st.session_state.emp_select, False)
+    st.session_state.stage4 = 0
     if "data_masiva" in st.session_state:
         del st.session_state["data_masiva"]
     elif "datos_clientes_por_sinc_prof" in st.session_state:
         del st.session_state["datos_clientes_por_sinc_prof"]
     elif "datos_clientes_por_sinc_prof" in st.session_state:
         del st.session_state["df_clientes"]
-
-    if st.button("Cerrar sesión"):
-        logout()
-
-
-def logout():
-    st.session_state.logged_in = False
-    st.info("Se ha cerrado la sesión con éxito!")
-    sleep(0.5)
-    st.switch_page("app.py")

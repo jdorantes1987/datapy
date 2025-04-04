@@ -42,12 +42,12 @@ else:
     ruta_archivo = f"{carpeta}Planes Facturacion Clientes Izquierda.xlsx"
 
 
-if "stage" not in st.session_state or "data_masiva" not in st.session_state:
-    st.session_state.stage = 0
+if "stage4" not in st.session_state or "data_masiva" not in st.session_state:
+    st.session_state.stage4 = 0
 
 
 def set_stage(i):
-    st.session_state.stage = i
+    st.session_state.stage4 = i
 
 
 if st.button("Refrescar"):
@@ -107,7 +107,7 @@ def lista_clientes(empresa):
     return ClsData(empresa).clientes()
 
 
-if st.session_state.stage == 0:
+if st.session_state.stage4 == 0:
     st.session_state.disabled = False
     ss.data_masiva = obtener_data(ruta_archivo)
     ss.data_masiva = ss.data_masiva[ss.data_masiva["facturar"]]
@@ -241,15 +241,15 @@ def data_validada():
 data_validada()
 
 
-if st.session_state.stage >= 1 and st.session_state.stage != 3:
+if st.session_state.stage4 >= 1 and st.session_state.stage4 != 3:
     st.button("Facturar", on_click=facturar, args=[3])
 
-if st.session_state.stage == 4:
+if st.session_state.stage4 == 4:
     set_stage(0)
     st.switch_page("pages/page2.py")
 
 
-if st.session_state.stage >= 3:
+if st.session_state.stage4 >= 3:
     set_stage(0)
     st.success("Facturación procesada!")
     col1, col2 = st.columns([0.1, 0.1])
