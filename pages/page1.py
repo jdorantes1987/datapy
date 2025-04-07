@@ -2,7 +2,7 @@ import os
 import time
 from datetime import date, datetime
 from io import BytesIO
-from multiprocessing import Process, Queue
+from threading import Thread
 
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
@@ -34,21 +34,17 @@ def archivo_xlsx_bcv_actualizado():
     return archivo_actualizado
 
 
-def update_file(tasks_to_accomplish, tasks_that_are_done):
+def update_file_thread(tasks_that_are_done):
     update_f = actulizar_file_tasas()
-    if update_f:
-        tasks_that_are_done.put(True)
-    else:
-        tasks_that_are_done.put(False)
+    tasks_that_are_done.append(update_f)
 
 
 def update_tasa_bcv():
-    tasks_to_accomplish = Queue()
-    tasks_that_are_done = Queue()
-    p = Process(target=update_file, args=(tasks_to_accomplish, tasks_that_are_done))
-    p.start()
-    p.join()
-    return tasks_that_are_done.get()
+    tasks_that_are_done = []
+    thread = Thread(target=update_file_thread, args=(tasks_that_are_done,))
+    thread.start()
+    thread.join()
+    return tasks_that_are_done[0]
 
 
 def local_css(file_name):
