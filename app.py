@@ -22,7 +22,6 @@ def roles():
 
 
 st.title("Inicio de sesión")
-st.write("Por favor ingrese su usuario.")
 
 
 def set_stage(i):
