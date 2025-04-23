@@ -35,11 +35,11 @@ def make_sidebar():
         st.write("")
         st.write("")
 
+        # chequea si el usuario está logueado
         if st.session_state.get("logged_in", False):
-            _extracted_from_make_sidebar()
+            _extracted_from_make_sidebar()  # llama a la función que crea el sidebar
         elif get_current_page_name() != "app":
-            # If anyone tries to access a secret page without being logged in,
-            # redirect them to the login page
+            # si no está logueado y no está en la página de login, redirige a la página de login
             st.switch_page("app.py")
 
 
@@ -69,14 +69,15 @@ def _extracted_from_make_sidebar():
     elif ur.ClsUsuariosRoles.roles().get("Izquierda", 0)[1] == 0:
         l_modulos.pop(1)
 
-    empresa_select = st.selectbox(
+    st.radio(
         "Seleccione la empresa:",
         l_modulos,
         index=l_modulos.index(ClsEmpresa.modulo()),
         key="emp_select",
         on_change=al_cambiar_empresa,
+        horizontal=True,
     )
-    ClsEmpresa(empresa_select, False)
+    # ClsEmpresa(empresa_select, False)
 
     def logout():
         st.session_state.logged_in = False
@@ -92,6 +93,7 @@ def al_cambiar_empresa():
     st.cache_data.clear()
     if "emp_select" in st.session_state:
         ClsEmpresa(st.session_state.emp_select, False)
+        del st.session_state["emp_select"]
     st.session_state.stage4 = 0
     if "data_masiva" in st.session_state:
         del st.session_state["data_masiva"]
