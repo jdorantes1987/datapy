@@ -56,6 +56,11 @@ def facturacion_saldo_x_intervalo_dias(empresa, usd):
     return ClsData(empresa).facturacion_saldo_x_intervalo_dias(usd=usd)
 
 
+@st.cache_data
+def saldo_a_favor_clientes(empresa):
+    return ClsData(empresa).saldo_a_favor_clientes()
+
+
 with st.spinner("consultando datos..."):
     make_sidebar()
 
@@ -258,3 +263,34 @@ st.download_button(
     f"Cobranza {ClsEmpresa.modulo()}.xlsx",
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 )
+
+if select_emp == "BANTEL_I":
+    st.write(
+        """#### Saldo a favor de clientes""",
+    )
+    saldo_a_favor = saldo_a_favor_clientes(select_emp)
+    saldo_a_favor.rename(
+        columns={
+            "co_cli": "Código",
+            "cli_des": "Cliente",
+            "saldo": "Saldo a favor",
+        },
+        inplace=True,
+    )
+    format_dict = {
+        "Saldo a favor": "{:,.2f}",
+    }
+    saldo_a_favor["Saldo a favor"] = saldo_a_favor["Saldo a favor"].abs()
+    st.dataframe(
+        saldo_a_favor.style.format(format_dict),
+        use_container_width=True,
+        hide_index=True,
+    )
+
+    saldo_a_favor.to_excel(buf := BytesIO())
+    st.download_button(
+        "Download file",
+        buf.getvalue(),
+        f"Saldo a favor {ClsEmpresa.modulo()}.xlsx",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
