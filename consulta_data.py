@@ -84,6 +84,9 @@ class ClsData:
     def facturacion_saldo_x_intervalo_dias(self, usd):
         return self.odata.facturacion_saldo_x_intervalo_dias(usd=usd)
 
+    def saldo_a_favor_clientes(self):
+        return self.odata.doc_cxc_clientes_resumido()
+
     @audit
     def ultimo_plan_facturado(self):
         articulos = self.articulos()[["co_art", "art_des"]]
