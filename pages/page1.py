@@ -130,12 +130,12 @@ fig = fig.add_trace(
         x=df_hist_tasas["fecha"].dt.normalize(),
         y=df_hist_tasas["venta_ask2"],
         mode="lines+markers",  # marcadores puntos
-        marker=dict(  # configura tamaño y color del marcador
-            size=3,
+        marker=dict(
+            size=3,  # tamaño del marcador o circulo
             color="rgba(255, 217, 102, .9)",
             line=dict(
                 color="rgba(191, 70, 0, .8)",  # configura color y tamaño de la linea
-                width=1,
+                width=1,  # tamaño de la línea del borde del marcador o circulo
             ),
         ),
         text="Tasa",
@@ -147,7 +147,7 @@ fig.update_layout(
     title="Histórico de tasas BCV",
     plot_bgcolor="#f5fafa",
 )
-fig.update_xaxes(nticks=13)
+fig.update_xaxes(nticks=13)  # número de ticks en el eje x
 st.plotly_chart(fig, use_container_width=True)
 
 st.subheader("Histórico de tasas BCV")
