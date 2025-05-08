@@ -163,25 +163,49 @@ with st.spinner("consultando datos..."):
             ingresos_ultimos_meses["anio"] + " " + ingresos_ultimos_meses["mes_x"]
         )
         fig_ium = go.Figure()
+
+        # quitar espacio en blanco en los bordes de la gráfica
+        fig_ium.update_layout(
+            height=250,  # altura de la figura
+            width=500,  # ancho de la figura
+            margin=dict(l=0, r=0, t=0, b=0),
+            plot_bgcolor="#f5fafa",  # color de fondo de la gráfica
+        )
+
         fig_ium = fig_ium.add_trace(
             go.Scatter(
                 x=ingresos_ultimos_meses["anio_mes"],
                 y=ingresos_ultimos_meses["monto_base_item"],
                 mode="lines+markers+text",  # marcadores puntos
                 marker=dict(
-                    color="#5D69B1", size=6
+                    color="#5D69B1", size=6  # tamaño del marcador o circulo
                 ),  # configura tamaño y color del marcador
                 line=dict(
-                    color="#52BCA3", width=1, dash="dash"
+                    color="#52BCA3", width=1, dash="solid"
                 ),  # configura color y tamaño de la linea
                 text=round(
                     ingresos_ultimos_meses["monto_base_item"].apply("${:,.2f}".format),
                     2,
                 ),  # texto que se muestra al pasar el mouse
                 textposition="top center",  # posición del texto
-                name="Ingresos",
+                name="Ingresos",  # nombre de la serie
             )
         )
+        minimo = ingresos_ultimos_meses["monto_base_item"].min()
+        maximo = ingresos_ultimos_meses["monto_base_item"].max()
+        fig_ium.update_yaxes(
+            range=[
+                round(
+                    minimo - (minimo / 7),
+                    ndigits=2,
+                ),
+                round(
+                    maximo + (maximo / 7),
+                    ndigits=2,
+                ),
+            ],
+        )
+        fig_ium.update_xaxes(nticks=20)  # número de ticks en el eje x
         st.plotly_chart(fig_ium, use_container_width=True)
 
     #  Crea la información que va en la columna dos del primer contenedor
@@ -190,6 +214,10 @@ with st.spinner("consultando datos..."):
         value=str("{:,.2f}".format(total_ing)),
         delta=str("{:,.2f}".format(neto_anio_ant_menos_anio_act)),
     )
+
+    # Espacio entre filas
+    st.write("")
+    st.write("")
 
     col11, col12 = st.columns(2, gap="small")
     with col11:
@@ -228,8 +256,17 @@ with st.spinner("consultando datos..."):
             vendedor: df_ing_group[df_ing_group["ven_des"] == vendedor]
             for vendedor in vendedores
         }  # Crea un diccionario para cada vendedor con sus ingresos por mes
+
         st.write("""##### Gráfica de ingresos por vendedor y mes""")
         fig = go.Figure()
+        # quitar espacio en blanco en los bordes de la gráfica
+        fig.update_layout(
+            height=250,  # altura de la figura
+            width=500,  # ancho de la figura
+            margin=dict(l=0, r=0, t=0, b=0),
+            plot_bgcolor="#f5fafa",  # color de fondo de la gráfica
+        )
+
         for vendedor, df_ing_group in dfs.items():
             fig = fig.add_trace(
                 go.Scatter(
