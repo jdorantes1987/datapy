@@ -265,10 +265,8 @@ st.download_button(
 )
 
 if select_emp == "BANTEL_I":
-    st.write(
-        """#### Saldo a favor de clientes""",
-    )
     saldo_a_favor = saldo_a_favor_clientes(select_emp)
+
     saldo_a_favor.rename(
         columns={
             "co_cli": "Código",
@@ -277,20 +275,43 @@ if select_emp == "BANTEL_I":
         },
         inplace=True,
     )
-    format_dict = {
-        "Saldo a favor": "{:,.2f}",
-    }
-    saldo_a_favor["Saldo a favor"] = saldo_a_favor["Saldo a favor"].abs()
-    st.dataframe(
-        saldo_a_favor.style.format(format_dict),
-        use_container_width=True,
-        hide_index=True,
-    )
 
-    saldo_a_favor.to_excel(buf := BytesIO())
-    st.download_button(
-        "Download file",
-        buf.getvalue(),
-        f"Saldo a favor {ClsEmpresa.modulo()}.xlsx",
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    )
+    saldo_a_favor["Saldo a favor"] = saldo_a_favor["Saldo a favor"].abs()
+
+    saldo_a_favor.sort_values(
+        by=["Saldo a favor"], ascending=False, inplace=True
+    )  # ordena el dataframe por la columna "Saldo a favor" de forma descendente
+
+    if len(saldo_a_favor) > 0:
+        st.write("")
+        st.write("""#### Cliente con saldo a favor """)
+        col41, col42 = st.columns(2, gap="small")
+        with col41:
+            st.metric(
+                label="Saldo",
+                value="{:,.2f}".format(saldo_a_favor["Saldo a favor"].sum()),
+            )
+
+        with col42:
+            st.metric(
+                label="Cantidad",
+                value="{:.0f}".format(saldo_a_favor["Saldo a favor"].count()),
+            )
+
+        format_dict = {
+            "Saldo a favor": "{:,.2f}",
+        }
+
+        st.dataframe(
+            saldo_a_favor.style.format(format_dict),
+            use_container_width=False,
+            hide_index=True,
+        )
+
+        saldo_a_favor.to_excel(buf := BytesIO())
+        st.download_button(
+            "Download file",
+            buf.getvalue(),
+            f"Saldo a favor {ClsEmpresa.modulo()}.xlsx",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
