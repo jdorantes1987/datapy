@@ -12,7 +12,6 @@ from gestion_user.usuarios import ClsUsuarios
 
 
 class FacturacionMasiva:
-
     def __init__(self, data, host, data_base):
         self.data = data
         self.data_base = data_base
@@ -392,7 +391,19 @@ class FacturacionMasiva:
 
     def procesar_facturacion_masiva(self, modulo, a_bs, num_fact_format):
         # Convierte el dataframe obtenido a un diccionario
-        lista_last_documents = self.odata.get_last__nro_fact_venta().to_dict()
+        if modulo == "Derecha":
+            from datetime import date
+
+            hoy = date.today().strftime("%Y-%m-%d")
+            # Puedes pasar parámetros de consulta si la API los soporta, por ejemplo: {"numeroFactura": "12345"}
+            params = {
+                "fechaInicio": "2025-06-20",  # Fecha de inicio del rango
+                "fechaFin": hoy,  # Fecha de fin del rango
+            }
+            lista_last_documents = self.get_last_invoice(params)
+        else:
+            lista_last_documents = self.odata.get_last__nro_fact_venta().to_dict()
+
         # asigna a la variable el último número de factura emitida en profit
         num_doc = (
             lista_last_documents["doc_num"][0]
@@ -412,6 +423,37 @@ class FacturacionMasiva:
             f"Módulo: {modulo} Fecha: {today} Usuario: {ClsUsuarios.nombre()} running: procesar_facturacion_masiva()"
         )
         print("Transacción confirmada.")
+
+    def get_last_invoice(self, params) -> str:
+        import os
+        import sys
+
+        from dotenv import load_dotenv
+
+        # # Agrega el directorio facturacion_digital a la ruta SYS
+        sys.path.append("..\\facturacion_digital")
+        from api_gateway_client import ApiGatewayClient
+        from api_key_manager import ApiKeyManager
+        from get_api_invoices import GetInvoices
+        from token_generator import TokenGenerator
+
+        path_api_key = os.path.join("..\\facturacion_digital", "api_key.txt")
+        token_actualizado = TokenGenerator(path_api_key=path_api_key).update_token()
+        if token_actualizado["success"]:
+            env_path = os.path.join("..\\facturacion_digital", ".env")
+            load_dotenv(
+                dotenv_path=env_path,
+                override=True,
+            )  # Recarga las variables de entorno desde el archivo
+            api_url = os.getenv("API_GATEWAY_URL_GET_LIST_INVOICES")
+            api_key_manager = ApiKeyManager(
+                os.path.join("..\\facturacion_digital", "api_key.txt")
+            )
+            client = ApiGatewayClient(api_url, api_key_manager)
+            invoice_consultas = GetInvoices(client)
+            return invoice_consultas.get_last_invoice(params)
+        else:
+            return None
 
 
 if __name__ == "__main__":
