@@ -52,7 +52,7 @@ class FacturacionMasiva:
         data_["nro_doc"] = data_.apply(
             lambda x: (
                 str(int(x["nro_doc"]) + int(x["grupo"]) + 1).zfill(6)
-                if format_fact is True
+                if True
                 else (int(x["nro_doc"]) + int(x["grupo"]) + 1)
             ),
             axis=1,
@@ -61,7 +61,7 @@ class FacturacionMasiva:
             lambda x: (
                 str(int(x["nro_control"]) + int(x["grupo"]) + 1).zfill(6)
                 if format_fact is True
-                else "00-0" + str(int(x["nro_control"]) + int(x["grupo"]) + 1)
+                else "00-" + str(int(x["nro_control"]) + int(x["grupo"]) + 1).zfill(8)
             ),
             axis=1,
         )
@@ -289,7 +289,7 @@ class FacturacionMasiva:
             "[seriales_s] ,[salestax] ,[impfis] ,[impfisfac] ,[imp_nro_z] ,[campo1] ,[campo2] ,[campo3] ,"
             "[campo4] ,[campo5] ,[campo6] ,[campo7] ,[campo8] ,[co_us_in] ,[co_sucu_in] ,[fe_us_in] ,"
             "[co_us_mo] ,[co_sucu_mo] ,[fe_us_mo])     "
-            "VALUES ('{doc}', '{descr}', '{c_cli}', '01', 'BS', "
+            "VALUES ('{doc}', '{descr}', '{c_cli}', 'NA', 'BS', "
             "'{ven}', '01', '{f_fact}', '{f_fact}', '{f_fact}', 0, '0', "
             "'{n_contr}', 0, 1, NULL, 0, NULL, 0, {m_base}, {m_iva}, 0, 0, 0, 0, 0, {m_total}, {m_total}, NULL, "
             "'{coment}', NULL, NULL, NULL, "
@@ -395,12 +395,17 @@ class FacturacionMasiva:
             from datetime import date
 
             hoy = date.today().strftime("%Y-%m-%d")
+
             # Puedes pasar parámetros de consulta si la API los soporta, por ejemplo: {"numeroFactura": "12345"}
-            params = {
+            rango_fechas = {
                 "fechaInicio": "2025-06-20",  # Fecha de inicio del rango
                 "fechaFin": hoy,  # Fecha de fin del rango
             }
-            lista_last_documents = self.get_last_invoice(params)
+            lista_last_documents = (
+                self.odata.get_last__nro_fact_venta_facturacion_digital(
+                    param=rango_fechas
+                ).to_dict()
+            )
         else:
             lista_last_documents = self.odata.get_last__nro_fact_venta().to_dict()
 
@@ -436,6 +441,12 @@ class FacturacionMasiva:
         from api_key_manager import ApiKeyManager
         from get_api_invoices import GetInvoices
         from token_generator import TokenGenerator
+
+        env_path = os.path.join("..\\facturacion_digital", ".env")
+        load_dotenv(
+            dotenv_path=env_path,
+            override=True,
+        )  # Recarga las variables de entorno desde el archivo
 
         path_api_key = os.path.join("..\\facturacion_digital", "api_key.txt")
         token_actualizado = TokenGenerator(path_api_key=path_api_key).update_token()
