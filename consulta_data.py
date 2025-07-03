@@ -1,11 +1,14 @@
 import os
+import sys
 from datetime import datetime
 
-from accesos.datos_profit import datos_profit
 from pandas import merge
 
 from empresa import ClsEmpresa
 from gestion_user.usuarios import ClsUsuarios
+
+sys.path.append("..\\bantel")
+from accesos.datos_profit import datos_profit
 
 
 class ClsData:
@@ -109,7 +112,64 @@ class ClsData:
         ultimo_plan["fec_emis"] = ultimo_plan["fec_emis"].dt.strftime("%d-%m-%Y")
         return ultimo_plan.sort_values(by="doc_num", ascending=[False])
 
+    @audit
+    def ultimo_plan_facturado_implementacion_imprenta(self):
+        from datetime import date
+
+        from dotenv import load_dotenv
+
+        sys.path.append("..\\profit")
+        from conn.database_connector import DatabaseConnector
+        from conn.sql_server_connector import SQLServerConnector
+        from data.mod.ventas.facturas_ventas import FacturasVentas
+
+        env_path = os.path.join("..\\profit", ".env")
+        load_dotenv(
+            env_path, override=True
+        )  # Recarga las variables de entorno desde el archivo
+
+        # Para SQL Server
+        sqlserver_connector = SQLServerConnector(
+            host=os.environ["HOST_PRODUCCION_PROFIT"],
+            database=self.data_base,
+            user=os.environ["DB_USER_PROFIT"],
+            password=os.environ["DB_PASSWORD_PROFIT"],
+        )
+        db = DatabaseConnector(sqlserver_connector)
+        oFacturaVentas = FacturasVentas(db)
+        hoy = date.today().strftime("%Y-%m-%d")
+        params = {
+            "fechaInicio": "2025-06-20",  # Fecha de inicio del rango
+            "fechaFin": hoy,  # Fecha de fin del rango
+        }
+        df = oFacturaVentas.get_facturas(
+            fecha_d=params["fechaInicio"], fecha_h=params["fechaFin"]
+        )
+        # Eliminar filas donde 'co_cli' o 'co_art' son nulos de una forma más eficiente u optimizada
+        df["co_cli"] = df["co_cli"].map(str.strip)
+        df["co_art"] = df["co_art"].map(str.strip)
+        clientes = self.clientes()[["co_cli", "cli_des"]]
+        df = merge(
+            df,
+            clientes,
+            how="left",
+            left_on="co_cli",
+            right_on="co_cli",
+        )
+        # La propieda 'as_index=False' permite mantener los encabezados en la agrupación o groupby
+        ultimas_facturas = df.groupby(["co_cli"], sort=False, as_index=False)[
+            ["fec_emis", "doc_num_encab"]
+        ].max()
+        conjunto_ultimas_facturas = set(ultimas_facturas["doc_num_encab"])
+        utimo_plan_facturado = df[df["doc_num_encab"].isin(conjunto_ultimas_facturas)][
+            ["doc_num_encab", "fec_emis", "co_cli", "cli_des", "co_art"]
+        ]
+        utimo_plan_facturado["fec_emis"] = utimo_plan_facturado["fec_emis"].dt.strftime(
+            "%d-%m-%Y"
+        )
+        return utimo_plan_facturado.sort_values(by="doc_num_encab", ascending=[False])
+
 
 if __name__ == "__main__":
     data = ClsData("BANTEL_A")
-    print(data.ultimo_plan_facturado())
+    print(data.ultimo_plan_facturado_implementacion_imprenta())
