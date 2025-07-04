@@ -37,6 +37,25 @@ with tab1:
     :blue[Información de los datos de clientes]."""
     )
     st.session_state.df_clientes = clientes(company_selected)
+
+    # Filtrar clientes activos e inactivos con un radio
+    filter_option = st.radio(
+        "Filtrar clientes:",
+        ("Todos", "Activos", "Inactivos"),
+        horizontal=True,
+        key="filter_clientes",
+    )
+    if filter_option == "Activos":
+        st.session_state.df_clientes = st.session_state.df_clientes[
+            ~st.session_state.df_clientes["inactivo"]
+        ]
+    elif filter_option == "Inactivos":
+        st.session_state.df_clientes = st.session_state.df_clientes[
+            st.session_state.df_clientes["inactivo"]
+        ]
+    elif filter_option == "Todos":
+        st.session_state.df_clientes = st.session_state.df_clientes
+
     st.dataframe(
         st.session_state.df_clientes, use_container_width=True, hide_index=True
     )
