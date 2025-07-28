@@ -162,7 +162,7 @@ class ClsData:
         ].max()
         conjunto_ultimas_facturas = set(ultimas_facturas["doc_num_encab"])
         utimo_plan_facturado = df[df["doc_num_encab"].isin(conjunto_ultimas_facturas)][
-            ["doc_num_encab", "fec_emis", "co_cli", "cli_des", "co_art"]
+            ["doc_num_encab", "fec_emis", "co_cli", "cli_des", "co_art", "art_des"]
         ]
         utimo_plan_facturado["fec_emis"] = utimo_plan_facturado["fec_emis"].dt.strftime(
             "%d-%m-%Y"
