@@ -38,7 +38,7 @@ def login(user, passw):
         date = datetime.now()
         print(f"{date} Usuario {user} ha iniciado sesión.")
         st.session_state.logged_in = True
-        st.success("Sesión iniciada exitosamente!")
+        st.toast("Sesión iniciada exitosamente!", icon="✅")
         st.cache_data.clear()
         st.session_state["refrescar_facturacion"] = False
         sleep(0.5)
