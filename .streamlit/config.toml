@@ -2,8 +2,8 @@
 showSidebarNavigation = false
 
 [theme]
-primaryColor="#4285f4"  # Azul característico de Google
-backgroundColor="#1e1e1e" # Un gris muy oscuro, casi negro
-secondaryBackgroundColor="#2a2a2a" # Un gris ligeramente más claro para los paneles
-textColor="#e0e0e0" # Un gris claro para el texto principal
-font="sans serif"
+primaryColor="#6164ffff"
+backgroundColor="#2d2d2d"
+secondaryBackgroundColor="#414141"
+textColor="#f0f0f0"
+font="monospace"
