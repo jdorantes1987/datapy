@@ -187,6 +187,10 @@ with st.spinner("consultando datos..."):
                     ingresos_ultimos_meses["monto_base_item"].apply("${:,.2f}".format),
                     2,
                 ),  # texto que se muestra al pasar el mouse
+                textfont=dict(
+                    size=10,  # tamaño del texto
+                    color="#000000",  # color del texto
+                ),
                 textposition="top center",  # posición del texto
                 name="Ingresos",  # nombre de la serie
             )
