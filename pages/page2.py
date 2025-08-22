@@ -188,8 +188,9 @@ with st.spinner("consultando datos..."):
                     2,
                 ),  # texto que se muestra al pasar el mouse
                 textfont=dict(
-                    size=10,  # tamaño del texto
+                    size=12,  # tamaño del texto
                     color="#000000",  # color del texto
+                    family="monospace",  # tipo de letra
                 ),
                 textposition="top center",  # posición del texto
                 name="Ingresos",  # nombre de la serie
