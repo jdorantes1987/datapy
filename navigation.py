@@ -14,10 +14,6 @@ def get_current_page_name():
     if ctx is None:
         raise RuntimeError("No se pudo obtener el contexto del script.")
 
-    # Alternative logic to determine the current page name
-    # Replace this with your own logic if needed
-    return ctx.script_name.split("/")[-1].replace(".py", "")
-
 
 def make_sidebar():
     with st.sidebar:
