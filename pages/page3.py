@@ -239,6 +239,9 @@ with st.spinner("consultando datos..."):
             delta_color="off",
         )
 
+# codigo para verificar si anio_select es None asignado el valor "all"
+if anio_select is None:
+    anio_select = "all"
 
 datos = cuentas_por_cobrar_pivot(
     empresa=select_emp,
