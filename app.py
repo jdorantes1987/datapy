@@ -68,6 +68,7 @@ else:
 
     if password:
         if not login(user=st.session_state.usuario, passw=password):
-            st.error("usuario o clave incorrecta")
-            sleep(1)
-            st.rerun()
+            st.toast(
+                "Error al iniciar sesión. Por favor, verifica tus credenciales.",
+                icon="❌",
+            )
