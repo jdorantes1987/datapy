@@ -86,6 +86,8 @@ def _extracted_from_make_sidebar():
 
 
 def al_cambiar_empresa():
+    # Reinicia las variables de sesión relacionadas con la pagina 5
+    st.session_state.stage5 = 0
     st.cache_data.clear()
     if "emp_select" in st.session_state:
         ClsEmpresa(st.session_state.emp_select, False)
