@@ -126,7 +126,6 @@ def add_clientes_en_mikrowisp():
     g.add_notificaciones()
     st.info("Cliente registrado con éxito!")
     st.session_state.agregar_presionado = False
-    set_stage(3)
 
 
 if st.session_state.stage5 == 2:
@@ -135,7 +134,7 @@ if st.session_state.stage5 == 2:
         st.rerun()
 
 #  DATOS POR ACTUALIZAR EN MIKROWISP
-if st.session_state.stage5 == 3:
+if len(st.session_state.datos_x_sinc) > 0:
     st.cache_data.clear()
     clientes_a_ignorar = set(st.session_state.client_x_reg["co_cli"])
     datos_clientes_por_sinc_sin_clientes_por_agregar = st.session_state.datos_x_sinc[
@@ -168,4 +167,5 @@ if st.session_state.stage5 == 3:
                 g.sinc_datos_clientes_nodos()
                 st.info("Cliente actualizado con éxito en Profit!")
                 st.cache_data.clear()
+                set_stage(0)
                 st.rerun()
