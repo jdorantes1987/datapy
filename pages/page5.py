@@ -153,6 +153,7 @@ if len(st.session_state.datos_x_sinc) > 0:
                 g.sinc_datos_clientes_profit_mikrowisp()
                 st.info("Cliente actualizado con éxito en Mikrowisp!")
                 st.cache_data.clear()
+                set_stage(0)
                 st.rerun()
 
     if len(st.session_state.clientes_por_act_nodo) > 0:
