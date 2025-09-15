@@ -133,6 +133,8 @@ if st.session_state.stage5 == 1:
             )
             if st.button("agregar", on_click=state_click_add):
                 set_stage(2)
+    else:
+        set_stage(3)
 
 
 @st.fragment
