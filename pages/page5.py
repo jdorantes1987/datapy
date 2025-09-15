@@ -65,9 +65,9 @@ if (
 if st.session_state.stage5 == 0:
     st.session_state.client_x_reg = datos_clientes_por_registrar()
     st.session_state.datos_x_sinc = datos_clientes_por_sinc_profit_mikrowisp()
-    st.session_state.clientes_por_act_nodo = (
-        datos_clientes_nodo_por_sinc_mikrowisp_profit()
-    )
+    # st.session_state.clientes_por_act_nodo = (
+    #     datos_clientes_nodo_por_sinc_mikrowisp_profit()
+    # )
     set_stage(1)
 
 
@@ -105,18 +105,18 @@ with st.expander("🔍 Grupos por cliente"):
         st.write(f":blue[{len(grupo)} cliente(s)]")
         st.dataframe(grupo, use_container_width=True, hide_index=True)
 
-# if "agregar_presionado" not in st.session_state:
-#     st.session_state.agregar_presionado = False
 
-#  CLIENTES POR REGISTRAR EN MIKROWISP
-if st.session_state.stage5 == 1 and len(st.session_state.client_x_reg) > 0:
-    st.write("📗 Clientes en Profit por registrar en Mikrowisp")
-    with st.expander("detalle"):
-        st.dataframe(
-            st.session_state.client_x_reg,
-            use_container_width=True,
-            hide_index=True,
-        )
+# ETAPA 1: CLIENTES POR REGISTRAR EN MIKROWISP
+if st.session_state.stage5 == 1:
+    if len(st.session_state.client_x_reg) > 0:
+        st.write("📗 Clientes en Profit por registrar en Mikrowisp")
+        with st.expander("detalle"):
+            st.dataframe(
+                st.session_state.client_x_reg,
+                use_container_width=True,
+                hide_index=True,
+            )
+
         if st.button("Agregar"):
             set_stage(2)
 
@@ -124,49 +124,46 @@ if st.session_state.stage5 == 1 and len(st.session_state.client_x_reg) > 0:
 def add_clientes_en_mikrowisp():
     g.add_clientes_en_mikrowisp()
     g.add_notificaciones()
-    st.info("Cliente registrado con éxito!")
-    st.session_state.agregar_presionado = False
 
 
 if st.session_state.stage5 == 2:
-    with st.spinner("Registrando clientes en Mikrowisp..."):
-        add_clientes_en_mikrowisp()
-        st.rerun()
+    add_clientes_en_mikrowisp()
+    st.toast("Clientes registrados con éxito en Mikrowisp!", icon="✅")
+    set_stage(3)
+    st.rerun()
 
-#  DATOS POR ACTUALIZAR EN MIKROWISP
-if len(st.session_state.datos_x_sinc) > 0:
-    st.cache_data.clear()
-    clientes_a_ignorar = set(st.session_state.client_x_reg["co_cli"])
-    datos_clientes_por_sinc_sin_clientes_por_agregar = st.session_state.datos_x_sinc[
-        ~st.session_state.datos_x_sinc["co_cli"].isin(clientes_a_ignorar)
-    ]
-    datos_clientes_por_sinc_prof = datos_clientes_por_sinc_sin_clientes_por_agregar
-    if len(datos_clientes_por_sinc_prof) > 0:
-        st.write("⚡ Clientes por actualizar en Mikrowisp desde Profit")
-        with st.expander("datos"):
-            st.dataframe(
-                datos_clientes_por_sinc_prof,
-                use_container_width=True,
-                hide_index=True,
-            )
-            if st.button("Actualizar datos básicos"):
-                g.sinc_datos_clientes_profit_mikrowisp()
-                st.info("Cliente actualizado con éxito en Mikrowisp!")
-                st.cache_data.clear()
-                set_stage(0)
-                st.rerun()
+if st.session_state.stage5 == 3:
+    pass
 
-    if len(st.session_state.clientes_por_act_nodo) > 0:
-        st.write("🔄 Clientes por actualizar nodo en Profit")
-        with st.expander("datos"):
-            st.dataframe(
-                st.session_state.clientes_por_act_nodo,
-                use_container_width=True,
-                hide_index=True,
-            )
-            if st.button("Actualizar"):
-                g.sinc_datos_clientes_nodos()
-                st.info("Cliente actualizado con éxito en Profit!")
-                st.cache_data.clear()
-                set_stage(0)
-                st.rerun()
+# #  DATOS POR ACTUALIZAR EN MIKROWISP
+# if len(st.session_state.datos_x_sinc) > 0:
+#     clientes_a_ignorar = set(st.session_state.client_x_reg["co_cli"])
+#     datos_clientes_por_sinc_sin_clientes_por_agregar = st.session_state.datos_x_sinc[
+#         ~st.session_state.datos_x_sinc["co_cli"].isin(clientes_a_ignorar)
+#     ]
+#     datos_clientes_por_sinc_prof = datos_clientes_por_sinc_sin_clientes_por_agregar
+#     if len(datos_clientes_por_sinc_prof) > 0:
+#         st.write("⚡ Clientes por actualizar en Mikrowisp desde Profit")
+#         with st.expander("detalle"):
+#             st.dataframe(
+#                 datos_clientes_por_sinc_prof,
+#                 use_container_width=True,
+#                 hide_index=True,
+#             )
+#             if st.button("Actualizar datos básicos"):
+#                 g.sinc_datos_clientes_profit_mikrowisp()
+#                 st.info("Cliente actualizado con éxito en Mikrowisp!")
+#                 set_stage(0)
+
+#     if len(st.session_state.clientes_por_act_nodo) > 0:
+#         st.write("🔄 Clientes por actualizar nodo en Profit")
+#         with st.expander("detalle"):
+#             st.dataframe(
+#                 st.session_state.clientes_por_act_nodo,
+#                 use_container_width=True,
+#                 hide_index=True,
+#             )
+#             if st.button("Actualizar"):
+#                 g.sinc_datos_clientes_nodos()
+#                 st.info("Cliente actualizado con éxito en Profit!")
+#                 set_stage(0)
