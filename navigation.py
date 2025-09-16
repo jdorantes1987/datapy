@@ -86,16 +86,17 @@ def _extracted_from_make_sidebar():
 
 
 def al_cambiar_empresa():
-    # Reinicia las variables de sesión relacionadas con la pagina 5
+    # Reinicia las variables de sesión relacionadas con las paginas
     st.session_state.stage5 = 0
+    st.session_state.stage4 = 0
     st.cache_data.clear()
+
+    # Limpia las variables de sesión específicas de las páginas
+    for key in ["data_masiva", "client_x_reg", "datos_x_sinc"]:
+        if key in st.session_state:
+            del st.session_state[key]
+
+    # Actualiza la empresa seleccionada y limpia variables de sesión relacionadas
     if "emp_select" in st.session_state:
         ClsEmpresa(st.session_state.emp_select, False)
         del st.session_state["emp_select"]
-    st.session_state.stage4 = 0
-    if "data_masiva" in st.session_state:
-        del st.session_state["data_masiva"]
-    elif "datos_clientes_por_sinc_prof" in st.session_state:
-        del st.session_state["datos_clientes_por_sinc_prof"]
-    elif "datos_clientes_por_sinc_prof" in st.session_state:
-        del st.session_state["df_clientes"]
