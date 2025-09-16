@@ -57,12 +57,12 @@ def _extracted_from_make_sidebar():
     st.page_link("pages/page7.py", label="Configuración", icon=None)
 
     st.write("\n" * 2)
-    l_modulos = ["Izquierda", "Derecha"]
+    l_modulos = ["Derecha", "Izquierda"]
 
     # administra el acceso del usuario a los módulos
-    if ur.ClsUsuariosRoles.roles().get("Izquierda", 0)[1] == 0:
+    if ur.ClsUsuariosRoles.roles().get("Derecha", 0)[1] == 0:
         l_modulos.pop(0)
-    elif ur.ClsUsuariosRoles.roles().get("Derecha", 0)[1] == 0:
+    elif ur.ClsUsuariosRoles.roles().get("Izquierda", 0)[1] == 0:
         l_modulos.pop(1)
 
     st.radio(
