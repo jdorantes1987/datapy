@@ -24,6 +24,20 @@ if "data_select" not in st.session_state:
     st.session_state["data_select"] = anio_actual
 
 
+def set_stage(i):
+    st.session_state.stage5 = i
+
+
+if st.button("Refrescar"):
+    st.cache_data.clear()
+    set_stage(0)
+
+
+@st.cache_data
+def datos_bcv():
+    return datos_estadisticas_tasas()
+
+
 def archivo_xlsx_bcv_actualizado():
     path = "..\\bantel\\accesos\\excel\\tasas_BCV.xlsx"
     # obtiene la última fecha de modificación.
@@ -113,17 +127,25 @@ if __name__ == "__main__":
                 st.info("Tasa BCV actualizada!")
         st.rerun()
 
-data_historico_tasa = datos_estadisticas_tasas()
-year_list = data_historico_tasa["año"].unique().tolist()  # Lista de todos los años
+if "stage1" not in st.session_state or "tasas" not in st.session_state:
+    st.session_state.stage1 = 0
+    st.session_state.tasas = datos_bcv()
+
+if st.session_state.stage1 == 0:
+    pass
+
+
+# Datos históricos de tasas BCV
+year_list = st.session_state.tasas["año"].unique().tolist()  # Lista de todos los años
 year_list.insert(0, "Todos")
 data_select = st.pills("Datos", year_list, default=anio_actual, selection_mode="single")
 st.session_state["data_select"] = data_select
 filter_data_tasas = (
-    (data_historico_tasa["año"] == st.session_state["data_select"])
+    (st.session_state.tasas["año"] == st.session_state["data_select"])
     if st.session_state["data_select"] != "Todos"
-    else (data_historico_tasa["año"] > 0)
+    else (st.session_state.tasas["año"] > 0)
 )
-df_hist_tasas = data_historico_tasa[filter_data_tasas]
+df_hist_tasas = st.session_state.tasas[filter_data_tasas]
 fig = go.Figure()
 fig = fig.add_trace(
     go.Scatter(
