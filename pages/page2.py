@@ -11,7 +11,6 @@ from navigation import make_sidebar
 st.set_page_config(page_title="DataPy: Ingresos", layout="wide", page_icon=":vs:")
 
 st.title("Ingresos")
-anio_actual = date.today().year
 
 
 def local_css(file_name):
@@ -24,9 +23,12 @@ local_css("style.css")
 # Inicialización de estado
 for k, v in {
     "anio_select_ventas": date.today().year,
+    "anio_select": str(date.today().year),
     "ingresos_anios_anteriores": 0.00,
     "documentos": None,
     "stage2": 0,
+    "moneda": "USD",
+    "es_USD": False,
 }.items():
     if k not in st.session_state:
         st.session_state[k] = v
@@ -57,9 +59,8 @@ def total_ingresos_anio_anterior(empresa, anio, vendedor, usd):
 
 
 make_sidebar()
-select_emp = ClsEmpresa.empresa_seleccionada()
+emp_select = ClsEmpresa.empresa_seleccionada()
 modulo = ClsEmpresa.modulo()
-conv_usd = ClsEmpresa.convert_usd()
 
 col1, col2 = st.columns(2, gap="small")
 with col1:
@@ -69,17 +70,30 @@ with col1:
         st.rerun()
 
 col3, col4, col5 = st.columns(3, gap="small")
+
+monedas = ["USD", "Bs"]
+
 with col3:
-    if select_emp == "BANTEL_A":
-        moneda = st.selectbox(
-            "Seleccione la moneda:", ["USD", "Bs"], 0, on_change=set_stage, args=(0,)
+    if emp_select == "BANTEL_A":
+        moneda_select = st.selectbox(
+            "Seleccione la moneda:",
+            monedas,
+            key="moneda",
+            on_change=set_stage,
+            args=(2,),
         )
-        conv_usd = moneda == "USD"
-        emp = ClsEmpresa(modulo, conv_usd).sel_emp
+        emp = ClsEmpresa(modulo, moneda_select).sel_emp
+        st.session_state.es_USD = True if moneda_select == "USD" else False
 
 if st.session_state.stage2 == 0:
-    st.session_state.documentos = data_documentos(select_emp, usd=conv_usd)
-    set_stage(1)
+    st.session_state.anio_select = str(date.today().year)
+    set_stage(2)
+
+if st.session_state.stage2 == 2:
+    st.session_state.documentos = data_documentos(
+        emp_select, usd=st.session_state.es_USD
+    )
+    set_stage(3)
 
 datos = st.session_state.documentos
 datos[["anio", "mes_x"]] = datos[["anio", "mes_x"]].astype(str)
@@ -96,9 +110,11 @@ with col4:
     anio = st.pills(
         "Periodos:",
         sorted(year_list, reverse=True),
-        default=str(anio_actual),
+        key="anio_select",
+        # default=str(max(year_list)),
         selection_mode="single",
     )
+    anio = st.session_state["anio_select"]
     st.session_state["anio_select_ventas"] = anio
     sellers_anio = ingresos_por_anio[
         ingresos_por_anio["anio"] == st.session_state["anio_select_ventas"]
@@ -155,7 +171,7 @@ anio_ant = int(anio) - 1
 
 if int(anio) > primer_anio:
     ingresos_anio_anterior = total_ingresos_anio_anterior(
-        select_emp, anio=anio_ant, vendedor=seller, usd=conv_usd
+        emp_select, anio=anio_ant, vendedor=seller, usd=st.session_state.es_USD
     )
 else:
     ingresos_anio_anterior = 0.00
