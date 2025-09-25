@@ -65,8 +65,10 @@ modulo = ClsEmpresa.modulo()
 col1, col2 = st.columns(2, gap="small")
 with col1:
     if st.button("Refrescar"):
-        st.cache_data.clear()
+        # Limpiar la caché de la función de datos y reiniciar la etapa
+        data_documentos.clear()
         set_stage(0)
+        st.session_state.moneda = "USD"
         st.rerun()
 
 col3, col4, col5 = st.columns(3, gap="small")
