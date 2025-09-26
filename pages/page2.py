@@ -86,6 +86,8 @@ with col3:
         )
         emp = ClsEmpresa(modulo, moneda_select).sel_emp
         st.session_state.es_USD = True if moneda_select == "USD" else False
+    else:
+        st.session_state.es_USD = False
 
 if st.session_state.stage2 == 0:
     st.session_state.anio_select = str(date.today().year)
