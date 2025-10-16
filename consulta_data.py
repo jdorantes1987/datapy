@@ -1,10 +1,14 @@
 import os
+import sys
 from datetime import datetime
 
 from pandas import merge
 
 from empresa import ClsEmpresa
 from gestion_user.usuarios import ClsUsuarios
+
+sys.path.append("..\\profit")
+sys.path.append("..\\conexiones")
 
 from accesos.datos_profit import datos_profit
 
@@ -167,9 +171,5 @@ class ClsData:
 
 
 if __name__ == "__main__":
-    import sys
-
-    sys.path.append("..\\profit")
-    sys.path.append("..\\conexiones")
     data = ClsData("BANTEL_A")
     print(data.ultimo_plan_facturado_implementacion_imprenta())
