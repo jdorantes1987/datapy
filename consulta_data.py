@@ -1,5 +1,4 @@
 import os
-import sys
 from datetime import datetime
 
 from pandas import merge
@@ -7,7 +6,6 @@ from pandas import merge
 from empresa import ClsEmpresa
 from gestion_user.usuarios import ClsUsuarios
 
-sys.path.append("..\\bantel")
 from accesos.datos_profit import datos_profit
 
 
@@ -116,14 +114,12 @@ class ClsData:
     def ultimo_plan_facturado_implementacion_imprenta(self):
         from datetime import date
 
-        from dotenv import load_dotenv
-
-        sys.path.append("..\\profit")
         from conn.database_connector import DatabaseConnector
         from conn.sql_server_connector import SQLServerConnector
         from data.mod.ventas.facturas_ventas import FacturasVentas
+        from dotenv import load_dotenv
 
-        env_path = os.path.join("..\\profit", ".env")
+        env_path = os.path.join("..\\conexiones", ".env")
         load_dotenv(
             env_path, override=True
         )  # Recarga las variables de entorno desde el archivo
@@ -171,5 +167,9 @@ class ClsData:
 
 
 if __name__ == "__main__":
+    import sys
+
+    sys.path.append("..\\profit")
+    sys.path.append("..\\conexiones")
     data = ClsData("BANTEL_A")
     print(data.ultimo_plan_facturado_implementacion_imprenta())
