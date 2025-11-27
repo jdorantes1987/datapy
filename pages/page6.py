@@ -72,9 +72,9 @@ with tab2:
         """
     :blue[Información de la última facturación]."""
     )
-    st.df_ultimo_plan_facturado = ultimo_plan_facturado(company_selected)
+    df_ultimo_plan_facturado = ultimo_plan_facturado(company_selected)
     st.dataframe(
-        st.df_ultimo_plan_facturado,
+        df_ultimo_plan_facturado,
         column_config={
             "doc_num": st.column_config.TextColumn(
                 "documento",
@@ -101,6 +101,6 @@ with tab2:
                 width="large",
             ),
         },
-        use_container_width=False,
+        use_container_width=True,
         hide_index=True,
     )

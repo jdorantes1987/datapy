@@ -123,7 +123,7 @@ class ClsData:
         from data.mod.ventas.facturas_ventas import FacturasVentas
         from dotenv import load_dotenv
 
-        env_path = os.path.join("..\\conexiones", ".env")
+        env_path = os.path.join("../conexiones", ".env")
         load_dotenv(
             env_path, override=True
         )  # Recarga las variables de entorno desde el archivo
@@ -135,6 +135,7 @@ class ClsData:
             user=os.environ["DB_USER_PROFIT"],
             password=os.environ["DB_PASSWORD_PROFIT"],
         )
+        sqlserver_connector.connect()
         db = DatabaseConnector(sqlserver_connector)
         oFacturaVentas = FacturasVentas(db)
         hoy = date.today().strftime("%Y-%m-%d")
@@ -142,9 +143,11 @@ class ClsData:
             "fechaInicio": "2025-06-20",  # Fecha de inicio del rango
             "fechaFin": hoy,  # Fecha de fin del rango
         }
-        df = oFacturaVentas.get_facturas(
-            fecha_d=params["fechaInicio"], fecha_h=params["fechaFin"]
+        df = oFacturaVentas.get_facturas_x_articulos(
+            fecha_desde=params["fechaInicio"],
+            fecha_hasta=params["fechaFin"],
         )
+        db.close_connection()
         # Eliminar filas donde 'co_cli' o 'co_art' son nulos de una forma más eficiente u optimizada
         df["co_cli"] = df["co_cli"].map(str.strip)
         df["co_art"] = df["co_art"].map(str.strip)
@@ -158,16 +161,16 @@ class ClsData:
         )
         # La propieda 'as_index=False' permite mantener los encabezados en la agrupación o groupby
         ultimas_facturas = df.groupby(["co_cli"], sort=False, as_index=False)[
-            ["fec_emis", "doc_num_encab"]
+            ["fec_emis", "doc_num"]
         ].max()
-        conjunto_ultimas_facturas = set(ultimas_facturas["doc_num_encab"])
-        utimo_plan_facturado = df[df["doc_num_encab"].isin(conjunto_ultimas_facturas)][
-            ["doc_num_encab", "fec_emis", "co_cli", "cli_des", "co_art", "art_des"]
+        conjunto_ultimas_facturas = set(ultimas_facturas["doc_num"])
+        utimo_plan_facturado = df[df["doc_num"].isin(conjunto_ultimas_facturas)][
+            ["doc_num", "fec_emis", "co_cli", "cli_des", "co_art", "art_des"]
         ]
         utimo_plan_facturado["fec_emis"] = utimo_plan_facturado["fec_emis"].dt.strftime(
             "%d-%m-%Y"
         )
-        return utimo_plan_facturado.sort_values(by="doc_num_encab", ascending=[False])
+        return utimo_plan_facturado.sort_values(by="doc_num", ascending=[False])
 
 
 if __name__ == "__main__":
