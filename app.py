@@ -1,11 +1,22 @@
+import os
+import sys
 from datetime import datetime
 from time import sleep
 
 import streamlit as st
+from dotenv import load_dotenv
 
 from empresa import ClsEmpresa
-from gestion_user.control_usuarios import aut_user
 from gestion_user.usuarios_roles import ClsUsuariosRoles
+
+sys.path.append("../authenticator")
+sys.path.append("../profit")
+sys.path.append("../conexiones")
+
+from auth import AuthManager  # noqa: E402
+from conn.database_connector import DatabaseConnector  # noqa: E402
+from conn.sql_server_connector import SQLServerConnector  # noqa: E402
+from role_manager_db import RoleManagerDB  # noqa: E402
 
 st.set_page_config(
     page_title="DataPy",
@@ -15,6 +26,15 @@ st.set_page_config(
 )
 
 MENU_INICIO = "pages/page1.py"
+
+# Cargar las claves de session si no existen
+for key, default in [
+    ("stage", 0),
+    ("conexion", None),
+    ("logged_in", False),
+]:
+    if key not in st.session_state:
+        st.session_state[key] = default
 
 
 def roles():
@@ -28,47 +48,105 @@ def set_stage(i):
     st.session_state.stage = i
 
 
-if "stage" not in st.session_state:
-    st.session_state.stage = 0
+if st.session_state.stage == 0:
+    st.session_state.password = ""
+    env_path = os.path.join("../conexiones", ".env")
+    load_dotenv(
+        dotenv_path=env_path,
+        override=True,
+    )  # Recarga las variables de entorno desde el archivo
+
+    # Para SQL Server
+    db_credentials = {
+        "host": os.getenv("HOST_PRODUCCION_PROFIT"),
+        "database": os.getenv("DB_NAME_DERECHA_PROFIT"),
+        "user": os.getenv("DB_USER_PROFIT"),
+        "password": os.getenv("DB_PASSWORD_PROFIT"),
+    }
+    sqlserver_connector = SQLServerConnector(**db_credentials)
+    try:
+        sqlserver_connector.connect()
+        # Almacenar la conexión
+        st.session_state.conexion = DatabaseConnector(sqlserver_connector)
+        # Almacenar el gestor de autenticación en session_state
+        st.session_state.auth_manager = AuthManager(st.session_state.conexion)
+        st.session_state.role_manager = RoleManagerDB(st.session_state.conexion)
+        set_stage(1)
+    except Exception as e:
+        st.error(f"No se pudo conectar a la base de datos: {e}")
+        st.stop()
+
+
+def existe_user(username):
+    return st.session_state.auth_manager.user_existe(username)
 
 
 def login(user, passw):
-    if aut_user(user=user, pw=passw):
-        set_stage(0)
-        date = datetime.now()
-        print(f"{date} Usuario {user} ha iniciado sesión.")
-        st.session_state.logged_in = True
-        st.toast("Sesión iniciada exitosamente!", icon="✅")
-        st.cache_data.clear()
-        st.session_state["refrescar_facturacion"] = False
-        sleep(0.5)
-        user_roles = roles()
-        # Define el módulo por defecto
-        modulo = "Izquierda" if user_roles.get("Izquierda", 0)[1] == 1 else "Derecha"
-        ClsEmpresa(modulo, False)
-        st.switch_page(MENU_INICIO)
-        return True
-    return False
+    return st.session_state.auth_manager.autenticar(user, passw)
 
 
-if "usuario" not in st.session_state:
-    # Si el usuario aún no ha sido ingresado
-    usuario = st.text_input("Ingresa tu usuario:")
-    if usuario and len(str.strip(usuario)) > 0:
-        st.session_state.usuario = usuario
-        st.rerun()
-else:
-    # Si el usuario ya ha sido ingresado, se oculta el input y se muestra el usuario ingresado
-    st.write(f"### Usuario ingresado: :blue[{st.session_state.usuario}]")
+@st.cache_data(show_spinner=False)
+def iniciar_sesion(user, password):
+    flag, msg = login(user=user, passw=password)
 
-    # Pedir la contraseña
-    password = st.text_input("Ingresa tu contraseña:", type="password")
-    if st.button("Log in", type="primary"):
-        login(user=st.session_state.usuario, passw=password)
+    if not flag:
+        st.toast(msg, icon="⚠️")
+    else:
+        # Verificar permisos
+        if st.session_state.rol_user.has_permission("EdoCta", "create"):
+            st.toast(msg, icon="✅")
+            st.session_state.logged_in = True
+            st.session_state.user = user
+            # Obtener código de cliente asociado
+            cod_cliente = st.session_state.auth_manager.get_data_user(user)[
+                "cod_client_asociation"
+            ]
+            st.session_state.cod_client = cod_cliente
+            st.switch_page(MENU_INICIO)
+        else:
+            st.error("No tienes permisos para acceder a esta aplicación.")
+            del st.session_state.usuario
+            sleep(0.5)
+            st.session_state.logged_in = False
+            set_stage(0)
+            st.rerun()
 
-    if password:
-        if not login(user=st.session_state.usuario, passw=password):
-            st.toast(
-                "Error al iniciar sesión. Por favor, verifica tus credenciales.",
-                icon="❌",
+
+if st.session_state.stage == 1:
+    if "usuario" not in st.session_state:
+        # Si el usuario aún no ha sido ingresado
+        user = st.text_input(
+            "", placeholder="Ingresa tu usuario y presiona Enter"
+        ).lower()
+        if existe_user(user):
+            st.session_state.usuario = user
+            st.success("Usuario validado!")
+            st.session_state.rol_user = (
+                st.session_state.role_manager.load_user_by_username(user)
             )
+            st.rerun()
+        else:
+            if user:
+                st.error("El usuario no existe. Inténtalo de nuevo.")
+    else:
+        # Si el usuario ya ha sido ingresado, se oculta el input y se muestra el usuario ingresado
+        st.write(f"### Usuario ingresado: :blue[{st.session_state.usuario}]")
+
+        # Pedir la contraseña
+        pw = st.text_input(
+            "",
+            type="password",
+            key="password",
+            placeholder="Ingresa tu contraseña y presiona Enter",
+            max_chars=70,
+        )
+        if st.session_state.password:
+            iniciar_sesion(st.session_state.usuario, st.session_state.password)
+
+        if not st.session_state.logged_in:
+            if st.button("Atrás"):
+                del st.session_state.usuario
+                del st.session_state.password
+                st.session_state.stage = 0
+                st.session_state.stage2 = 0
+                st.rerun()
