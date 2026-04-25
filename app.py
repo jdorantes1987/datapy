@@ -32,6 +32,10 @@ for key, default in [
     ("stage", 0),
     ("conexion", None),
     ("logged_in", False),
+    ("auth_manager", None),
+    ("role_manager", None),
+    ("rol_user", None),
+    ("emp_select", "BANTEL_A"),
 ]:
     if key not in st.session_state:
         st.session_state[key] = default
@@ -93,15 +97,11 @@ def iniciar_sesion(user, password):
         st.toast(msg, icon="⚠️")
     else:
         # Verificar permisos
-        if st.session_state.rol_user.has_permission("EdoCta", "create"):
+        rol_user = st.session_state.rol_user
+        if rol_user is not None and rol_user.has_permission("EdoCta", "create"):
             st.toast(msg, icon="✅")
             st.session_state.logged_in = True
             st.session_state.user = user
-            # Obtener código de cliente asociado
-            cod_cliente = st.session_state.auth_manager.get_data_user(user)[
-                "cod_client_asociation"
-            ]
-            st.session_state.cod_client = cod_cliente
             st.switch_page(MENU_INICIO)
         else:
             st.error("No tienes permisos para acceder a esta aplicación.")
@@ -124,6 +124,12 @@ if st.session_state.stage == 1:
             st.session_state.rol_user = (
                 st.session_state.role_manager.load_user_by_username(user)
             )
+            rol_user = st.session_state.rol_user
+            if rol_user is None:
+                st.error("No se pudo cargar el perfil del usuario.")
+                del st.session_state.usuario
+            elif rol_user.has_permission("Mod_izq", "read"):
+                st.session_state["emp_select"] = "BANTEL_I"
             st.rerun()
         else:
             if user:

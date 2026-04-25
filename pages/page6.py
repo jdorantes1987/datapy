@@ -3,7 +3,6 @@ from io import BytesIO
 import streamlit as st
 
 from consulta_data import ClsData
-from empresa import ClsEmpresa
 from navigation import make_sidebar
 
 st.set_page_config(page_title="DataPy: Clientes", layout="wide", page_icon=":vs:")
@@ -11,7 +10,8 @@ st.set_page_config(page_title="DataPy: Clientes", layout="wide", page_icon=":vs:
 st.header("📘 Clientes Profit", help="Clientes registrado en el sistema Profit Plus")
 
 make_sidebar()
-company_selected = ClsEmpresa.empresa_seleccionada()
+company_selected = st.session_state.get("emp_select", "BANTEL_A")
+modulo = "Derecha" if company_selected == "BANTEL_A" else "Izquierda"
 
 
 @st.cache_data
@@ -63,7 +63,7 @@ with tab1:
     st.download_button(
         "Download file",
         buf.getvalue(),
-        f"Clientes {ClsEmpresa.modulo()}.xlsx",
+        f"Clientes {modulo}.xlsx",
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     )
 

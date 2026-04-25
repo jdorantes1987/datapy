@@ -71,8 +71,9 @@ def tasa_manual(fecha, valor):
 
 
 if __name__ == "__main__":
-    odata = ClsData(data_base=os.getenv("DB_NAME_IZQUIERDA_PROFIT"))
-    new_cod = odata.generar_cod_cliente()
+    odata = ClsData(data_base=st.session_state.get("emp_select"))
+    emp_sel = st.session_state.get("emp_select")
+    new_cod = odata.generar_cod_cliente() if emp_sel == "BANTEL_I" else "N/A"
     date_t = datetime.strptime(str(odata.get_fecha_tasa_bcv_dia().date()), "%Y-%m-%d")
     table_scorecard = (
         """

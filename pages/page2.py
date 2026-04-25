@@ -59,7 +59,6 @@ def total_ingresos_anio_anterior(empresa, anio, vendedor, usd):
 
 
 make_sidebar()
-emp_select = ClsEmpresa.empresa_seleccionada()
 modulo = ClsEmpresa.modulo()
 
 col1, col2 = st.columns(2, gap="small")
@@ -76,7 +75,7 @@ col3, col4, col5 = st.columns(3, gap="small")
 monedas = ["USD", "Bs"]
 
 with col3:
-    if emp_select == "BANTEL_A":
+    if st.session_state.get("emp_select") == "BANTEL_A":
         moneda_select = st.selectbox(
             "Seleccione la moneda:",
             monedas,
@@ -84,7 +83,6 @@ with col3:
             on_change=set_stage,
             args=(2,),
         )
-        emp = ClsEmpresa(modulo, moneda_select).sel_emp
         st.session_state.es_USD = True if moneda_select == "USD" else False
     else:
         st.session_state.es_USD = False
@@ -94,8 +92,9 @@ if st.session_state.stage2 == 0:
     set_stage(2)
 
 if st.session_state.stage2 == 2:
+    e = st.session_state.get("emp_select")
     st.session_state.documentos = data_documentos(
-        emp_select, usd=st.session_state.es_USD
+        st.session_state.get("emp_select"), usd=st.session_state.es_USD
     )
     set_stage(3)
 
@@ -175,7 +174,10 @@ anio_ant = int(anio) - 1
 
 if int(anio) > primer_anio:
     ingresos_anio_anterior = total_ingresos_anio_anterior(
-        emp_select, anio=anio_ant, vendedor=seller, usd=st.session_state.es_USD
+        st.session_state.get("emp_select"),
+        anio=anio_ant,
+        vendedor=seller,
+        usd=st.session_state.es_USD,
     )
 else:
     ingresos_anio_anterior = 0.00

@@ -8,7 +8,6 @@ from pandas import merge
 from datetime import date
 
 from consulta_data import ClsData
-from empresa import ClsEmpresa
 from navigation import make_sidebar
 
 st.set_page_config(
@@ -64,9 +63,9 @@ def saldo_a_favor_clientes(empresa):
 with st.spinner("consultando datos..."):
     make_sidebar()
 
-    select_emp = ClsEmpresa.empresa_seleccionada()
-    conv_usd = ClsEmpresa.convert_usd()
-    modulo = ClsEmpresa.modulo()
+    select_emp = st.session_state.get("emp_select", "BANTEL_A")
+    conv_usd = st.session_state.get("es_USD", False)
+    modulo = "Derecha" if select_emp == "BANTEL_A" else "Izquierda"
 
     col1, col2 = st.columns(2, gap="small")
 
@@ -80,7 +79,6 @@ with st.spinner("consultando datos..."):
         if select_emp == "BANTEL_A":
             moneda = st.selectbox("Seleccione la moneda:", ["USD", "Bs"], 0)
             conv_usd = moneda == "USD"
-            emp = ClsEmpresa(modulo, conv_usd).sel_emp
 
     #  Obtiene los datos de los ingresos para la empresa seleccionada.
     ingresos = data_facturacion(select_emp, usd=conv_usd)
@@ -263,7 +261,7 @@ saldo_facturas.to_excel(buf := BytesIO())
 st.download_button(
     "Download file",
     buf.getvalue(),
-    f"Cobranza {ClsEmpresa.modulo()}.xlsx",
+    f"Cobranza {modulo}.xlsx",
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 )
 
@@ -315,6 +313,6 @@ if select_emp == "BANTEL_I":
         st.download_button(
             "Download file",
             buf.getvalue(),
-            f"Saldo a favor {ClsEmpresa.modulo()}.xlsx",
+            f"Saldo a favor {modulo}.xlsx",
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         )

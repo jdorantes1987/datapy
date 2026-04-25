@@ -8,7 +8,6 @@ from streamlit import data_editor as de
 from streamlit import session_state as ss
 
 from consulta_data import ClsData
-from empresa import ClsEmpresa
 from facturacion_masiva import FacturacionMasiva
 from navigation import make_sidebar
 
@@ -23,8 +22,8 @@ st.header(
 make_sidebar()
 anio_actual = date.today().year
 mes_actual = str(month_name[date.today().month]).upper()
-empresa_select = data_base = ClsEmpresa.empresa_seleccionada()
-modulo = ClsEmpresa.modulo()
+empresa_select = data_base = st.session_state.get("emp_select", "BANTEL_A")
+modulo = "Derecha" if empresa_select == "BANTEL_A" else "Izquierda"
 
 fecha = datetime(
     date.today().year,
@@ -36,7 +35,7 @@ fecha = datetime(
     microsecond=0,
 )
 carpeta = os.getenv("PATH_FOLDER_DESARROLLO_PROFIT")
-if ClsEmpresa.modulo() == "Derecha":
+if modulo == "Derecha":
     ruta_archivo = f"{carpeta}Planes Facturacion Clientes Derecha.xlsx"
 else:
     ruta_archivo = f"{carpeta}Planes Facturacion Clientes Izquierda.xlsx"
@@ -111,8 +110,8 @@ if st.session_state.stage4 == 0:
     st.session_state.disabled = False
     ss.data_masiva = obtener_data(ruta_archivo)
     ss.data_masiva = ss.data_masiva[ss.data_masiva["facturar"]]
-    ss.lista_articulos = lista_articulos(ClsEmpresa.empresa_seleccionada())
-    ss.lista_clientes = lista_clientes(ClsEmpresa.empresa_seleccionada())
+    ss.lista_articulos = lista_articulos(empresa_select)
+    ss.lista_clientes = lista_clientes(empresa_select)
     ss.lista_articulos["articulos"] = (
         ss.lista_articulos["co_art"] + " | " + ss.lista_articulos["art_des"]
     )
