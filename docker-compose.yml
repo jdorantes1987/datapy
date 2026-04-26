@@ -1,0 +1,24 @@
+services:
+  modulos:
+    image: img_orq_clients:latest
+    container_name: cnt_orq_clients
+    networks:
+      - netbantel
+    env_file:
+      - /home/jack/Projects/volume/mod/conexiones/.env
+    environment:
+      - PYTHONPATH=/home:/home/conexiones:/home/profit:/home/authenticator:/home/auth_ad
+      - PYTHONUNBUFFERED=1
+      - OPENSSL_CONF=/dev/null
+    volumes:
+      - /home/jack/Projects/volume/mod:/home
+    ports:
+      - "8502:8502"
+
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+
+networks:
+  netbantel:
+    external: true
