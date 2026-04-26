@@ -16,8 +16,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     tdsodbc \
     build-essential \
     libssl-dev \
-    && rm -rf /var/lib/apt/lists/* \
-    && rm -rf /tmp/*
+    # --- Añade estas líneas para mysqlclient ---
+    pkg-config \
+    default-libmysqlclient-dev \
+    # ------------------------------------------
+    && rm -rf /var/lib/apt/lists/*
 
 RUN echo "[FreeTDS]\n\
 Description = FreeTDS Driver\n\
@@ -31,6 +34,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-EXPOSE 8502
+EXPOSE 8510
 
-ENTRYPOINT ["streamlit", "run", "app.py", "--server.port=8502", "--server.address=0.0.0.0"]
+ENTRYPOINT ["streamlit", "run", "app.py", "--server.port=8510", "--server.addresDs=0.0.0.0"]
