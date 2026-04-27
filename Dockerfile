@@ -6,9 +6,14 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     STREAMLIT_SERVER_HEADLESS=true \
     STREAMLIT_SERVER_PORT=8502 \
-    STREAMLIT_SERVER_ADDRESS=0.0.0.0
+    STREAMLIT_SERVER_ADDRESS=0.0.0.0 \
+    # Configuramos las variables de entorno para el locale
+    LANG=es_ES.UTF-8 \
+    LC_ALL=es_ES.UTF-8
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    # --- Añadimos 'locales' aquí ---
+    locales \
     unixodbc \
     unixodbc-dev \
     freetds-dev \
@@ -16,11 +21,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     tdsodbc \
     build-essential \
     libssl-dev \
-    # --- Añade estas líneas para mysqlclient ---
     pkg-config \
     default-libmysqlclient-dev \
-    # ------------------------------------------
     && rm -rf /var/lib/apt/lists/*
+
+# Generamos el locale es_ES.UTF-8 específicamente
+RUN sed -i -e 's/# es_ES.UTF-8 UTF-8/es_ES.UTF-8 UTF-8/' /etc/locale.gen && \
+    locale-gen
 
 RUN echo "[FreeTDS]\n\
 Description = FreeTDS Driver\n\
