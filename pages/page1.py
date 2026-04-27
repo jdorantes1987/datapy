@@ -1,7 +1,7 @@
-import os
 import time
 from datetime import date, datetime
 from io import BytesIO
+from pathlib import Path
 from threading import Thread
 
 import matplotlib.pyplot as plt
@@ -39,9 +39,10 @@ def datos_bcv():
 
 
 def archivo_xlsx_bcv_actualizado():
-    path = "..\\bantel\\accesos\\excel\\tasas_BCV.xlsx"
+    path = "/home/bantel/accesos/excel/tasas_BCV.xlsx"
     # obtiene la última fecha de modificación.
-    modTimesinceEpoc = os.path.getmtime(path)
+    # modTimesinceEpoc = os.path.getmtime(path) # Versión arroja error en linux, se reemplaza por la función de Path
+    modTimesinceEpoc = Path(path).stat().st_mtime
     hoy = date.today()
     fecha_modificacion = datetime.fromtimestamp(modTimesinceEpoc).date()
     archivo_actualizado = hoy == fecha_modificacion
