@@ -12,6 +12,7 @@ services:
       - OPENSSL_CONF=/dev/null
     volumes:
       - /mnt/dockervolumen/mod:/home
+      - /mnt/wsrv-fstorage-1/:/home
     ports:
       - "8510:8510"
 
