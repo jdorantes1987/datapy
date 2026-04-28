@@ -141,7 +141,7 @@ class FacturacionMasiva:
             comentario = ""
         data_con_iva["fecha_fact"] = data_con_iva["fecha_fact"].dt.strftime("%Y%m%d")
         locale.setlocale(locale.LC_ALL, "es_ES.UTF-8")
-        campo5 = to_datetime(date_current).month_name(locale=""es_ES.UTF-8"")
+        campo5 = to_datetime(date_current).month_name(locale="es_ES.UTF-8")
         locale.setlocale(locale.LC_ALL, "")
         campo7 = to_datetime(date_current).year
         # itera la cantidad de documentos a facturar
