@@ -89,16 +89,25 @@ def login(user, passw):
     return st.session_state.auth_manager.autenticar(user, passw)
 
 
-@st.cache_data(show_spinner=False)
 def iniciar_sesion(user, password):
     flag, msg = login(user=user, passw=password)
 
     if not flag:
         st.toast(msg, icon="⚠️")
     else:
+        role = st.session_state.rol_user
         # Verificar permisos
-        rol_user = st.session_state.rol_user
-        if rol_user is not None and rol_user.has_permission("EdoCta", "create"):
+        print(role.has_permission("Mod_der", "read"))
+        if (
+            any(
+                role.has_permission(modulo, accion)
+                for modulo, accion in [
+                    ("Mod_der", "read"),
+                    ("Mod_izq", "read"),
+                ]
+            )
+            and role is not None
+        ):
             st.toast(msg, icon="✅")
             st.session_state.logged_in = True
             st.session_state.user = user
