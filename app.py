@@ -97,7 +97,6 @@ def iniciar_sesion(user, password):
     else:
         role = st.session_state.rol_user
         # Verificar permisos
-        print(role.has_permission("Mod_der", "read"))
         if (
             any(
                 role.has_permission(modulo, accion)
