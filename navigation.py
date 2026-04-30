@@ -56,10 +56,15 @@ def _extracted_from_make_sidebar():
     l_modulos = ["BANTEL_I", "BANTEL_A"]
 
     # administra el acceso del usuario a los módulos
-    if not st.session_state.rol_user.has_permission("Mod_der", "read"):
-        l_modulos.pop(1)
-    elif not st.session_state.rol_user.has_permission("Mod_izq", "read"):
-        l_modulos.pop(0)
+    es_admin = st.session_state.rol_user.has_permission("Administrador", "read")
+    tiene_mod_der = st.session_state.rol_user.has_permission("Mod_der", "read")
+    tiene_mod_izq = st.session_state.rol_user.has_permission("Mod_izq", "read")
+
+    if not es_admin:
+        if not tiene_mod_der and "BANTEL_A" in l_modulos:
+            l_modulos.remove("BANTEL_A")
+        if not tiene_mod_izq and "BANTEL_I" in l_modulos:
+            l_modulos.remove("BANTEL_I")
 
     if st.session_state.get("emp_select") not in l_modulos:
         st.session_state["emp_select"] = l_modulos[0]
