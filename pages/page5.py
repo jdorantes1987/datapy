@@ -1,3 +1,5 @@
+import os
+
 import streamlit as st
 
 from consulta_data import ClsData
