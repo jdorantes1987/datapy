@@ -35,7 +35,7 @@ for key, default in [
     ("auth_manager", None),
     ("role_manager", None),
     ("rol_user", None),
-    ("emp_select", "BANTEL_A"),
+    ("emp_select", "Derecha"),
 ]:
     if key not in st.session_state:
         st.session_state[key] = default
@@ -137,8 +137,18 @@ if st.session_state.stage == 1:
             if rol_user is None:
                 st.error("No se pudo cargar el perfil del usuario.")
                 del st.session_state.usuario
-            elif rol_user.has_permission("Mod_izq", "read"):
-                st.session_state["emp_select"] = "BANTEL_I"
+            else:
+                # administra el acceso del usuario a los módulos
+                es_admin = rol_user.has_permission("Administrador", "read")
+                if not es_admin:
+                    if rol_user.has_permission("Mod_der", "read"):
+                        st.session_state["emp_select"] = "Derecha"
+                    elif rol_user.has_permission("Mod_izq", "read"):
+                        st.session_state["emp_select"] = "Izquierda"
+
+                modulo = st.session_state["emp_select"]
+                # Define el módulo por defecto
+                ClsEmpresa(modulo, False)
             st.rerun()
         else:
             if user:

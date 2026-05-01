@@ -2,6 +2,7 @@ from time import sleep
 
 import streamlit as st
 from streamlit.runtime.scriptrunner import get_script_run_ctx
+from empresa import ClsEmpresa
 
 # Removed import of 'get_pages' as it is no longer available in Streamlit
 
@@ -53,7 +54,7 @@ def _extracted_from_make_sidebar():
     st.page_link("pages/page7.py", label="Configuración", icon=None)
 
     st.write("\n" * 2)
-    l_modulos = ["BANTEL_I", "BANTEL_A"]
+    l_modulos = ["Izquierda", "Derecha"]
 
     # administra el acceso del usuario a los módulos
     es_admin = st.session_state.rol_user.has_permission("Administrador", "read")
@@ -61,20 +62,19 @@ def _extracted_from_make_sidebar():
     tiene_mod_izq = st.session_state.rol_user.has_permission("Mod_izq", "read")
 
     if not es_admin:
-        if not tiene_mod_der and "BANTEL_A" in l_modulos:
-            l_modulos.remove("BANTEL_A")
-        if not tiene_mod_izq and "BANTEL_I" in l_modulos:
-            l_modulos.remove("BANTEL_I")
+        if not tiene_mod_der and "Derecha" in l_modulos:
+            l_modulos.remove("Derecha")
+        if not tiene_mod_izq and "Izquierda" in l_modulos:
+            l_modulos.remove("Izquierda")
 
-    if st.session_state.get("emp_select") not in l_modulos:
-        st.session_state["emp_select"] = l_modulos[0]
+    if not l_modulos:
+        st.warning("No tienes acceso a ningun modulo.")
+        return
 
     st.radio(
         "Seleccione la empresa:",
         l_modulos,
-        format_func=lambda empresa: (
-            "Derecha" if empresa == "BANTEL_A" else "Izquierda"
-        ),
+        index=l_modulos.index(ClsEmpresa.modulo()),
         key="emp_select",
         on_change=al_cambiar_empresa,
         horizontal=True,
@@ -107,3 +107,8 @@ def al_cambiar_empresa():
     for key in ["data_masiva", "client_x_reg", "datos_x_sinc"]:
         if key in st.session_state:
             del st.session_state[key]
+
+    # Actualiza la empresa seleccionada y limpia variables de sesión relacionadas
+    if "emp_select" in st.session_state:
+        ClsEmpresa(st.session_state.emp_select, False)
+        del st.session_state["emp_select"]
