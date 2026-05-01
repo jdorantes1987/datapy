@@ -1,6 +1,7 @@
 import streamlit as st
 
 from consulta_data import ClsData
+from empresa import ClsEmpresa
 from mikrowisp.controller.gestor_clientes import GestionarClientes
 from navigation import make_sidebar
 
@@ -12,7 +13,8 @@ st.header(
 )
 
 make_sidebar()
-company_selected = st.session_state.get("emp_select", "BANTEL_A")
+company_selected = ClsEmpresa.empresa_seleccionada()
+modulo = ClsEmpresa.modulo()
 
 
 def set_stage(i):
@@ -94,7 +96,7 @@ with st.expander("🔍 Grupos por cliente"):
         df_clientes = clientes(company_selected)
         id_grupo = grupo_select.split("|")[0]
         grupo_filtrado = df_clientes[df_clientes["matriz"] == id_grupo].copy()
-        if company_selected == "BANTEL_I":
+        if company_selected == os.getenv("DB_NAME_IZQUIERDA_PROFIT"):
             grupo_filtrado["co_cli_sort"] = grupo_filtrado["co_cli"].str.split(
                 "-", expand=True
             )[1]

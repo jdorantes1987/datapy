@@ -3,6 +3,7 @@ from io import BytesIO
 import streamlit as st
 
 from consulta_data import ClsData
+from empresa import ClsEmpresa
 from navigation import make_sidebar
 
 st.set_page_config(page_title="DataPy: Clientes", layout="wide", page_icon=":vs:")
@@ -10,8 +11,7 @@ st.set_page_config(page_title="DataPy: Clientes", layout="wide", page_icon=":vs:
 st.header("📘 Clientes Profit", help="Clientes registrado en el sistema Profit Plus")
 
 make_sidebar()
-company_selected = st.session_state.get("emp_select", "BANTEL_A")
-modulo = "Derecha" if company_selected == "BANTEL_A" else "Izquierda"
+company_selected = ClsEmpresa.empresa_seleccionada()
 
 
 @st.cache_data
@@ -32,10 +32,8 @@ if st.button("Refrescar"):
 tab1, tab2 = st.tabs(["👨‍🏫 Clientes", "🧾 Planes facturados"])
 
 with tab1:
-    st.markdown(
-        """
-    :blue[Información de los datos de clientes]."""
-    )
+    st.markdown("""
+    :blue[Información de los datos de clientes].""")
     st.session_state.df_clientes = clientes(company_selected)
 
     # Filtrar clientes activos e inactivos con un radio
@@ -63,15 +61,13 @@ with tab1:
     st.download_button(
         "Download file",
         buf.getvalue(),
-        f"Clientes {modulo}.xlsx",
+        f"Clientes {ClsEmpresa.modulo()}.xlsx",
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     )
 
 with tab2:
-    st.markdown(
-        """
-    :blue[Información de la última facturación]."""
-    )
+    st.markdown("""
+    :blue[Información de la última facturación].""")
     df_ultimo_plan_facturado = ultimo_plan_facturado(company_selected)
     st.dataframe(
         df_ultimo_plan_facturado,
