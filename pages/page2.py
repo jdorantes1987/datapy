@@ -43,8 +43,8 @@ def data_documentos(empresa, usd):
     df = ClsData(empresa).ventas_rsm(anio="all", mes="all", usd=usd)
     # Solo cambia el locale si es necesario
     try:
-        locale.setlocale(locale.LC_TIME, "es_ES")
-        df["mes_x"] = df["fec_reg"].dt.month_name(locale="es_ES").str[:3]
+        locale.setlocale(locale.LC_TIME, "es_ES.UTF-8")
+        df["mes_x"] = df["fec_reg"].dt.month_name(locale="es_ES.UTF-8").str[:3]
     except locale.Error:
         df["mes_x"] = df["fec_reg"].dt.month_name().str[:3]
     finally:
