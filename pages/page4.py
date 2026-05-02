@@ -128,7 +128,7 @@ edited_df = de(
             "buscar cliente",
             help="Busque y seleccione un cliente.",
             width="large",
-            options=ss.lista_clientes["clientes"],
+            options=ss.lista_clientes["clientes"].tolist(),
             required=True,
         ),
         "enum": st.column_config.NumberColumn(
@@ -154,7 +154,7 @@ edited_df = de(
             "buscar artículo",
             help="Busque y seleccione un artículo.",
             width="large",
-            options=ss.lista_articulos["articulos"],
+            options=ss.lista_articulos["articulos"].tolist(),
             required=True,
         ),
         "fecha_fact": st.column_config.DatetimeColumn(
