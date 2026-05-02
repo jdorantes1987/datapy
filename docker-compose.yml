@@ -7,7 +7,7 @@ services:
     env_file:
       - /mnt/dockervolumen/mod/conexiones/.env
     environment:
-      - PYTHONPATH=/home:/home/conexiones:/home/profit:/home/authenticator:/home/bantel
+      - PYTHONPATH=/home:/home/conexiones:/home/profit:/home/authenticator:/home/bantel:/home/auth_ad
       - PYTHONUNBUFFERED=1
       - OPENSSL_CONF=/dev/null
     volumes:

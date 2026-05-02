@@ -9,11 +9,14 @@ from dotenv import load_dotenv
 from empresa import ClsEmpresa
 from gestion_user.usuarios_roles import ClsUsuariosRoles
 
+sys.path.append("../auth_ad")
 sys.path.append("../authenticator")
 sys.path.append("../profit")
 sys.path.append("../conexiones")
 
+
 from auth import AuthManager  # noqa: E402
+from active_directory import ADAuthenticator  # noqa: E402
 from conn.database_connector import DatabaseConnector  # noqa: E402
 from conn.sql_server_connector import SQLServerConnector  # noqa: E402
 from role_manager_db import RoleManagerDB  # noqa: E402
@@ -67,13 +70,24 @@ if st.session_state.stage == 0:
         "user": os.getenv("DB_USER_PROFIT"),
         "password": os.getenv("DB_PASSWORD_PROFIT"),
     }
+    active_directory = {
+        "server_host": os.environ["AD_SERVER_HOST"],
+        "domain": os.environ["AD_DOMAIN"],
+        "use_ssl": False,
+        "port": 389,
+        "search_base": os.environ["AD_SEARCH_BASE"],
+    }
+
     sqlserver_connector = SQLServerConnector(**db_credentials)
     try:
         sqlserver_connector.connect()
         # Almacenar la conexión
         st.session_state.conexion = DatabaseConnector(sqlserver_connector)
         # Almacenar el gestor de autenticación en session_state
-        st.session_state.auth_manager = AuthManager(st.session_state.conexion)
+        st.session_state.auth_manager = AuthManager(
+            st.session_state.conexion,
+            ADAuthenticator(**active_directory),
+        )
         st.session_state.role_manager = RoleManagerDB(st.session_state.conexion)
         set_stage(1)
     except Exception as e:
