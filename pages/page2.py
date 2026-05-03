@@ -84,7 +84,7 @@ with col3:
             on_change=set_stage,
             args=(2,),
         )
-        emp = ClsEmpresa(modulo, moneda_select).sel_emp
+        emp = ClsEmpresa(st.session_state.usuario, modulo, moneda_select).sel_emp
         st.session_state.es_USD = True if moneda_select == "USD" else False
     else:
         st.session_state.es_USD = False

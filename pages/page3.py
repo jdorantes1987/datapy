@@ -80,7 +80,7 @@ with st.spinner("consultando datos..."):
         if select_emp == "BANTEL_A":
             moneda = st.selectbox("Seleccione la moneda:", ["USD", "Bs"], 0)
             conv_usd = moneda == "USD"
-            emp = ClsEmpresa(modulo, conv_usd).sel_emp
+            emp = ClsEmpresa(st.session_state.usuario, modulo, conv_usd).sel_emp
 
     #  Obtiene los datos de los ingresos para la empresa seleccionada.
     ingresos = data_facturacion(select_emp, usd=conv_usd)

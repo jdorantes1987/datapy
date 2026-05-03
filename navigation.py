@@ -90,6 +90,7 @@ def _extracted_from_make_sidebar():
 
 
 def logout():
+    ClsEmpresa.limpiar_usuario(st.session_state.get("usuario", ""))
     st.session_state.logged_in = False
     st.info("Se ha cerrado la sesión con éxito!")
     sleep(0.5)
@@ -110,5 +111,5 @@ def al_cambiar_empresa():
 
     # Actualiza la empresa seleccionada y limpia variables de sesión relacionadas
     if "emp_select" in st.session_state:
-        ClsEmpresa(st.session_state.emp_select, False)
+        ClsEmpresa(st.session_state.usuario, st.session_state.emp_select, False)
         del st.session_state["emp_select"]
