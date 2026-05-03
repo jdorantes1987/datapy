@@ -7,7 +7,7 @@ class ClsEmpresa:
     # Diccionario con clave=usuario y valor={empresa, modulo, moneda}
     _usuarios: dict = {}
 
-    def __init__(self, username: str, modulo_empresa: str, convertir_a_usd):
+    def __init__(self, username: str, modulo_empresa: str, convertir_a_usd: bool):
         empresa_select = (
             os.getenv("DB_NAME_DERECHA_PROFIT")
             if modulo_empresa == "Derecha"
@@ -18,7 +18,7 @@ class ClsEmpresa:
         ClsEmpresa._usuarios[username] = {
             "empresa": empresa_select,
             "modulo": modulo_empresa,
-            "moneda": convertir_a_usd,
+            "convertir_a_usd": convertir_a_usd,
         }
 
     @staticmethod
@@ -31,9 +31,9 @@ class ClsEmpresa:
         return str(ClsEmpresa._usuarios.get(username, {}).get("empresa", ""))
 
     @staticmethod
-    def convert_usd():
+    def convert_usd() -> bool:
         username = ClsEmpresa._get_username()
-        return ClsEmpresa._usuarios.get(username, {}).get("moneda", False)
+        return ClsEmpresa._usuarios.get(username, {}).get("convertir_a_usd", False)
 
     @staticmethod
     def modulo() -> str:
