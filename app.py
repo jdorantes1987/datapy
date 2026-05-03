@@ -162,7 +162,7 @@ if st.session_state.stage == 1:
 
                 modulo = st.session_state["emp_select"]
                 # Define el módulo por defecto
-                ClsEmpresa(modulo, False)
+                ClsEmpresa(st.session_state.usuario, modulo, False)
             st.rerun()
         else:
             if user:
