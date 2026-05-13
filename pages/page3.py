@@ -64,9 +64,9 @@ def saldo_a_favor_clientes(empresa):
 with st.spinner("consultando datos..."):
     make_sidebar()
 
-    select_emp = ClsEmpresa.empresa_seleccionada()
+    user = st.session_state.get("usuario")
+    emp_select = st.session_state.cls_empresa._usuarios.get(user, {}).get("empresa")
     conv_usd = ClsEmpresa.convert_usd()
-    modulo = ClsEmpresa.modulo()
 
     col1, col2 = st.columns(2, gap="small")
 
@@ -77,13 +77,12 @@ with st.spinner("consultando datos..."):
     col3, col4, col43 = st.columns(3, gap="small")
 
     with col3:
-        if select_emp == "BANTEL_A":
+        if emp_select == "BANTEL_A":
             moneda = st.selectbox("Seleccione la moneda:", ["USD", "Bs"], 0)
             conv_usd = moneda == "USD"
-            emp = ClsEmpresa(modulo, conv_usd).sel_emp
 
     #  Obtiene los datos de los ingresos para la empresa seleccionada.
-    ingresos = data_facturacion(select_emp, usd=conv_usd)
+    ingresos = data_facturacion(emp_select, usd=conv_usd)
     # Convierte las columnas año y mes a formato String
     ingresos[["anio", "mes_x"]] = ingresos[["anio", "mes_x"]].astype("str")
     #  Agrupa los ingresos por año y mes
@@ -100,7 +99,7 @@ with st.spinner("consultando datos..."):
     )
 
     datos_fact_x_cobrar = cuentas_por_cobrar_agrupadas(
-        empresa=select_emp, anio="all", mes="all", usd=conv_usd, vendedor="all"
+        empresa=emp_select, anio="all", mes="all", usd=conv_usd, vendedor="all"
     )
     year_list = sorted(
         datos_fact_x_cobrar["anio"].unique().tolist(), reverse=True
@@ -190,7 +189,7 @@ with st.spinner("consultando datos..."):
     with col32:
         st.write("""##### Vencimiento de documentos por intervalo de días""")
         saldo_por_intervalo = facturacion_saldo_x_intervalo_dias(
-            select_emp, usd=conv_usd
+            emp_select, usd=conv_usd
         )
         fig = go.Figure(
             data=[
@@ -244,7 +243,7 @@ if anio_select is None:
     anio_select = "all"
 
 datos = cuentas_por_cobrar_pivot(
-    empresa=select_emp,
+    empresa=emp_select,
     anio=anio_select,
     mes="all",
     usd=conv_usd,
@@ -267,8 +266,8 @@ st.download_button(
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 )
 
-if select_emp == "BANTEL_I":
-    saldo_a_favor = saldo_a_favor_clientes(select_emp)
+if emp_select == "BANTEL_I":
+    saldo_a_favor = saldo_a_favor_clientes(emp_select)
 
     saldo_a_favor.rename(
         columns={

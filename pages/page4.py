@@ -23,8 +23,9 @@ st.header(
 make_sidebar()
 anio_actual = date.today().year
 mes_actual = str(month_name[date.today().month]).upper()
-empresa_select = data_base = ClsEmpresa.empresa_seleccionada()
-modulo = ClsEmpresa.modulo()
+user = st.session_state.get("usuario")
+emp_select = st.session_state.cls_empresa._usuarios.get(user, {}).get("empresa")
+modulo = st.session_state.cls_empresa._usuarios.get(user, {}).get("modulo")
 
 fecha = datetime(
     date.today().year,
@@ -60,8 +61,8 @@ def obtener_data(file):
     df = read_excel(file)
     df["facturar"] = df["facturar"].apply(lambda x: x == "SI")
     df = df[(df["razon_social"] != "No existe!") & (df["desc_art"] != "No existe!")]
-    clientes = ClsData(empresa_select).clientes()[["co_cli", "cli_des"]]
-    articulos = ClsData(empresa_select).articulos()[["co_art", "art_des"]]
+    clientes = ClsData(emp_select).clientes()[["co_cli", "cli_des"]]
+    articulos = ClsData(emp_select).articulos()[["co_art", "art_des"]]
     #  Se combina data de facturación con la tabla clientes
     merge_data = merge(df, clientes, how="left", left_on="id_client", right_on="co_cli")
     #  Se combina data de facturación con la tabla artículos

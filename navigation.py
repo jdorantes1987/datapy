@@ -71,14 +71,16 @@ def _extracted_from_make_sidebar():
         st.warning("No tienes acceso a ningun modulo.")
         return
 
-    st.radio(
+    user = st.session_state.get("usuario")
+    mod_select = st.session_state.cls_empresa._usuarios.get(user, {}).get("modulo")
+    modulo = st.radio(
         "Seleccione la empresa:",
         l_modulos,
-        index=l_modulos.index(ClsEmpresa.modulo()),
-        key="emp_select",
+        index=l_modulos.index(mod_select),
         on_change=al_cambiar_empresa,
         horizontal=True,
     )
+    st.session_state.cls_empresa = ClsEmpresa(st.session_state.usuario, modulo, False)
 
     if st.button(
         "Cerrar sesión",
@@ -90,6 +92,7 @@ def _extracted_from_make_sidebar():
 
 
 def logout():
+    # ClsEmpresa.limpiar_usuario(st.session_state.get("usuario", ""))
     st.session_state.logged_in = False
     st.info("Se ha cerrado la sesión con éxito!")
     sleep(0.5)
@@ -107,8 +110,3 @@ def al_cambiar_empresa():
     for key in ["data_masiva", "client_x_reg", "datos_x_sinc"]:
         if key in st.session_state:
             del st.session_state[key]
-
-    # Actualiza la empresa seleccionada y limpia variables de sesión relacionadas
-    if "emp_select" in st.session_state:
-        ClsEmpresa(st.session_state.emp_select, False)
-        del st.session_state["emp_select"]

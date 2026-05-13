@@ -7,7 +7,6 @@ import streamlit as st
 from dotenv import load_dotenv
 
 from empresa import ClsEmpresa
-from gestion_user.usuarios_roles import ClsUsuariosRoles
 
 sys.path.append("../auth_ad")
 sys.path.append("../authenticator")
@@ -39,13 +38,10 @@ for key, default in [
     ("role_manager", None),
     ("rol_user", None),
     ("emp_select", "Derecha"),
+    ("cls_empresa", None),
 ]:
     if key not in st.session_state:
         st.session_state[key] = default
-
-
-def roles():
-    return ClsUsuariosRoles.roles()
 
 
 st.title("Inicio de sesión")
@@ -161,8 +157,10 @@ if st.session_state.stage == 1:
                         st.session_state["emp_select"] = "Izquierda"
 
                 modulo = st.session_state["emp_select"]
-                # Define el módulo por defecto
-                ClsEmpresa(modulo, False)
+                # Establece la empresa en la sesión
+                st.session_state.cls_empresa = ClsEmpresa(
+                    username=user, modulo_empresa=modulo, convertir_a_usd=False
+                )
             st.rerun()
         else:
             if user:

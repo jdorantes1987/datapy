@@ -5,7 +5,6 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from consulta_data import ClsData
-from empresa import ClsEmpresa
 from navigation import make_sidebar
 
 st.set_page_config(page_title="DataPy: Ingresos", layout="wide", page_icon=":vs:")
@@ -59,8 +58,8 @@ def total_ingresos_anio_anterior(empresa, anio, vendedor, usd):
 
 
 make_sidebar()
-emp_select = ClsEmpresa.empresa_seleccionada()
-modulo = ClsEmpresa.modulo()
+user = st.session_state.get("usuario")
+emp_select = st.session_state.cls_empresa._usuarios.get(user, {}).get("empresa")
 
 col1, col2 = st.columns(2, gap="small")
 with col1:
@@ -84,7 +83,6 @@ with col3:
             on_change=set_stage,
             args=(2,),
         )
-        emp = ClsEmpresa(modulo, moneda_select).sel_emp
         st.session_state.es_USD = True if moneda_select == "USD" else False
     else:
         st.session_state.es_USD = False

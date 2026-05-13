@@ -11,7 +11,9 @@ st.set_page_config(page_title="DataPy: Clientes", layout="wide", page_icon=":vs:
 st.header("📘 Clientes Profit", help="Clientes registrado en el sistema Profit Plus")
 
 make_sidebar()
-company_selected = ClsEmpresa.empresa_seleccionada()
+user = st.session_state.get("usuario")
+emp_select = st.session_state.cls_empresa._usuarios.get(user, {}).get("empresa")
+modulo = st.session_state.cls_empresa._usuarios.get(user, {}).get("modulo")
 
 
 @st.cache_data
@@ -34,7 +36,7 @@ tab1, tab2 = st.tabs(["👨‍🏫 Clientes", "🧾 Planes facturados"])
 with tab1:
     st.markdown("""
     :blue[Información de los datos de clientes].""")
-    st.session_state.df_clientes = clientes(company_selected)
+    st.session_state.df_clientes = clientes(emp_select)
 
     # Filtrar clientes activos e inactivos con un radio
     filter_option = st.radio(
@@ -61,14 +63,14 @@ with tab1:
     st.download_button(
         "Download file",
         buf.getvalue(),
-        f"Clientes {ClsEmpresa.modulo()}.xlsx",
+        f"Clientes {modulo}.xlsx",
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     )
 
 with tab2:
     st.markdown("""
     :blue[Información de la última facturación].""")
-    df_ultimo_plan_facturado = ultimo_plan_facturado(company_selected)
+    df_ultimo_plan_facturado = ultimo_plan_facturado(emp_select)
     st.dataframe(
         df_ultimo_plan_facturado,
         column_config={

@@ -15,8 +15,9 @@ st.header(
 )
 
 make_sidebar()
-company_selected = ClsEmpresa.empresa_seleccionada()
-modulo = ClsEmpresa.modulo()
+user = st.session_state.get("usuario")
+emp_select = st.session_state.cls_empresa._usuarios.get(user, {}).get("empresa")
+modulo = st.session_state.cls_empresa._usuarios.get(user, {}).get("modulo")
 
 
 def set_stage(i):
@@ -30,7 +31,7 @@ if (
     or "oGestionarClientes" not in st.session_state
     or "click_agregar" not in st.session_state
 ):
-    st.session_state.oGestionarClientes = GestionarClientes(company_selected)
+    st.session_state.oGestionarClientes = GestionarClientes(emp_select)
     set_stage(0)
 
 
@@ -90,15 +91,15 @@ def lista_grupos_clientes(empresa):
 
 
 with st.expander("🔍 Grupos por cliente"):
-    data_lista_clientes = lista_grupos_clientes(empresa=company_selected)
+    data_lista_clientes = lista_grupos_clientes(empresa=emp_select)
     grupo_select = str(st.selectbox("Elije un grupo:", data_lista_clientes, 0)).replace(
         " ", ""
     )
     if len(data_lista_clientes) > 0:
-        df_clientes = clientes(company_selected)
+        df_clientes = clientes(emp_select)
         id_grupo = grupo_select.split("|")[0]
         grupo_filtrado = df_clientes[df_clientes["matriz"] == id_grupo].copy()
-        if company_selected == os.getenv("DB_NAME_IZQUIERDA_PROFIT"):
+        if emp_select == os.getenv("DB_NAME_IZQUIERDA_PROFIT"):
             grupo_filtrado["co_cli_sort"] = grupo_filtrado["co_cli"].str.split(
                 "-", expand=True
             )[1]
