@@ -1,3 +1,4 @@
+import os
 import locale
 from io import BytesIO
 
@@ -77,7 +78,7 @@ with st.spinner("consultando datos..."):
     col3, col4, col43 = st.columns(3, gap="small")
 
     with col3:
-        if emp_select == "BANTEL_A":
+        if emp_select == os.getenv("DB_NAME_DERECHA_PROFIT"):
             moneda = st.selectbox("Seleccione la moneda:", ["USD", "Bs"], 0)
             conv_usd = moneda == "USD"
 
@@ -266,7 +267,7 @@ st.download_button(
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 )
 
-if emp_select == "BANTEL_I":
+if emp_select == os.getenv("DB_NAME_IZQUIERDA_PROFIT"):
     saldo_a_favor = saldo_a_favor_clientes(emp_select)
 
     saldo_a_favor.rename(

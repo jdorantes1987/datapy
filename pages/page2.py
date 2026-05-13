@@ -1,5 +1,6 @@
 import locale
 from datetime import date
+import os
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 import streamlit as st
@@ -75,7 +76,7 @@ col3, col4, col5 = st.columns(3, gap="small")
 monedas = ["USD", "Bs"]
 
 with col3:
-    if emp_select == "BANTEL_A":
+    if emp_select == os.getenv("DB_NAME_DERECHA_PROFIT"):
         moneda_select = st.selectbox(
             "Seleccione la moneda:",
             monedas,

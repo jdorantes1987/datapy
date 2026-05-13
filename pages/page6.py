@@ -1,4 +1,5 @@
 from io import BytesIO
+import os
 
 import streamlit as st
 
@@ -23,7 +24,7 @@ def clientes(empresa):
 
 @st.cache_data
 def ultimo_plan_facturado(empresa):
-    if empresa == "BANTEL_A":
+    if empresa == os.getenv("DB_NAME_DERECHA_PROFIT"):
         return ClsData(empresa).ultimo_plan_facturado_implementacion_imprenta()
     return ClsData(empresa).ultimo_plan_facturado()
 

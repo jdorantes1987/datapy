@@ -1,3 +1,4 @@
+import os
 import time
 from datetime import date, datetime
 from io import BytesIO
@@ -18,6 +19,13 @@ from navigation import make_sidebar
 
 st.set_page_config(page_title="DataPy: Inicio", layout="wide", page_icon=":vs:")
 
+# Inicialización de estado
+for k, v in {
+    "stage1": 0,
+}.items():
+    if k not in st.session_state:
+        st.session_state[k] = v
+
 st.header("Información")
 anio_actual = date.today().year
 if "data_select" not in st.session_state:
@@ -25,12 +33,15 @@ if "data_select" not in st.session_state:
 
 
 def set_stage(i):
-    st.session_state.stage5 = i
+    st.session_state.stage1 = i
 
 
 if st.button("Refrescar"):
-    st.cache_data.clear()
     set_stage(0)
+
+if st.session_state.stage1 == 0:
+    st.cache_data.clear()
+    set_stage(1)
 
 
 @st.cache_data
@@ -71,10 +82,15 @@ def tasa_manual(fecha, valor):
     actulizar_file_tasas_manual(fecha=fecha, valor_tasa=valor)
 
 
-if __name__ == "__main__":
-    odata = ClsData(data_base=st.session_state.get("emp_select"))
-    emp_sel = st.session_state.get("emp_select")
-    new_cod = odata.generar_cod_cliente() if emp_sel == "BANTEL_I" else "N/A"
+if __name__ == "__main__" or st.session_state.get("stage1", 0) == 0:
+    user = st.session_state.get("usuario")
+    emp_select = st.session_state.cls_empresa._usuarios.get(user, {}).get("empresa")
+    odata = ClsData(data_base=emp_select)
+    new_cod = (
+        odata.generar_cod_cliente()
+        if emp_select == os.getenv("DB_NAME_IZQUIERDA_PROFIT")
+        else "N/A"
+    )
     date_t = datetime.strptime(str(odata.get_fecha_tasa_bcv_dia().date()), "%Y-%m-%d")
     table_scorecard = (
         """
